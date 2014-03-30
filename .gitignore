@@ -3,3 +3,4 @@
 core/.project
 *.prefs
 **/target/**
+*.project
