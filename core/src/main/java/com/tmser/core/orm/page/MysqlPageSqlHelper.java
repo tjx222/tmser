@@ -1,7 +1,4 @@
-/**
- * 
- */
-package com.tmser.core.page;
+package com.tmser.core.orm.page;
 
 /**
  * Mysql 分页拼接工具实现

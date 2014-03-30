@@ -2,7 +2,6 @@ package com.tmser.core.orm;
 
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 
-import com.tmser.core.exception.ParamIllegalityException;
 
 /**
  * 带验证功能的，sqlParameterSource
@@ -37,17 +36,12 @@ public class ValidateAbleSqlParameterSource extends BeanPropertySqlParameterSour
 			throw new NullPointerException("table must be set befor this method invoke!" );
 		}
 		Object value = super.getValue(paramName);
-			try {
-				Column column = table.getColumnByAttrName(paramName);
-				if(column != null){
-					ValidateUtils.checkColumnValue(column,value);
+		Column column = table.getColumnByAttrName(paramName);
+		if(column != null){
+				ValidateUtils.checkColumnValue(column,value);
 					//throw new IllegalArgumentException("this table mapper bo doesn't has the parameter :"+paramName );
-				}
+		}
 				
-			} catch (ParamIllegalityException e) {
-				new IllegalArgumentException(e.getMessage());
-			}
-		
 		return value;
 	}
 }

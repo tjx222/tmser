@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
  * @author tjx
  * @version 2013-12-30
  */
-@SuppressWarnings("rawtypes")
 public class Reflections {
 
 	private static final String SETTER_PREFIX = "set";
@@ -33,7 +32,7 @@ public class Reflections {
 	/**
 	 * 调用Getter方法. 支持多级，如：对象名.对象名.方法
 	 */
-	public static <T> T invokeGetter(T t, String propertyName) {
+	public static <T> Object invokeGetter(T t, String propertyName) {
 		Object object = t;
 		for (String name : StringUtils.split(propertyName, ".")) {
 			String getterMethodName = GETTER_PREFIX
@@ -41,7 +40,7 @@ public class Reflections {
 			object = invokeMethod(object, getterMethodName, new Class[] {},
 					new Object[] {});
 		}
-		return (T) t;
+		return object;
 	}
 
 	/**
@@ -131,7 +130,7 @@ public class Reflections {
 	 */
 	public static Object invokeMethodByName(final Object obj,
 			final String methodName, final Object[] args) {
-		Method method = getAccessibleMethodByName(obj, methodName);
+		Method method = getAccessibleMethodByName(obj, methodName,args);
 		if (method == null) {
 			throw new IllegalArgumentException("Could not find method ["
 					+ methodName + "] on target [" + obj + "]");
@@ -195,10 +194,40 @@ public class Reflections {
 	}
 
 	/**
-	 * 循环向上转型, 获取对象的DeclaredMethod,并强制设置为可访问. 如向上转型到Object仍无法找到, 返回null. 只匹配函数名。
+	 * 调用public 方法
 	 * 
 	 * 用于方法需要被多次调用的情况. 先使用本函数先取得Method,然后调用Method.invoke(Object obj, Object...
 	 * args)
+	 * @throws IllegalStateException 
+	 */
+	public static Method getAccessibleMethodByName(final Object obj,
+			final String methodName,final Object[] args) {
+		Validate.notNull(obj, "object can't be null");
+		Validate.notBlank(methodName, "methodName can't be blank");
+		Class<?> ownerClass = obj.getClass();
+		Class<?>[] argsClass = new Class[args.length];
+		for (int i = 0; i < args.length; i++) {
+			if(args[i] != null)
+				argsClass[i] = args[i].getClass();
+		}
+		Method m = null;
+		try {
+			m = ownerClass.getMethod(methodName,argsClass);
+		} catch (NoSuchMethodException e) {
+			m = getAccessibleMethodByName(obj,methodName);
+			if(m == null)
+				throw new IllegalStateException(methodName+" doesn't existed!",e);
+		} catch (SecurityException e) {
+			throw new IllegalStateException(methodName+" cann't be visited!",e);
+		}
+		return m;
+	}
+
+	/**
+	 * 
+	 * @param obj
+	 * @param methodName
+	 * @return
 	 */
 	public static Method getAccessibleMethodByName(final Object obj,
 			final String methodName) {
@@ -207,7 +236,7 @@ public class Reflections {
 
 		for (Class<?> searchType = obj.getClass(); searchType != Object.class; searchType = searchType
 				.getSuperclass()) {
-			Method[] methods = searchType.getDeclaredMethods();
+			Method[] methods = searchType.getMethods();
 			for (Method method : methods) {
 				if (method.getName().equals(methodName)) {
 					makeAccessible(method);
@@ -217,7 +246,6 @@ public class Reflections {
 		}
 		return null;
 	}
-
 	/**
 	 * 改变private/protected的方法为public，尽量不调用实际改动的语句，避免JDK的SecurityManager抱怨。
 	 */
@@ -249,8 +277,7 @@ public class Reflections {
 	 * @return the first generic declaration, or Object.class if cannot be
 	 *         determined
 	 */
-	@SuppressWarnings("unchecked")
-	public static <T> Class<T> getClassGenricType(final Class clazz) {
+	public static Class<?> getClassGenricType(final Class<?> clazz) {
 		return getClassGenricType(clazz, 0);
 	}
 
@@ -266,7 +293,7 @@ public class Reflections {
 	 * @return the index generic declaration, or Object.class if cannot be
 	 *         determined
 	 */
-	public static Class getClassGenricType(final Class clazz, final int index) {
+	public static Class<?> getClassGenricType(final Class<?> clazz, final int index) {
 
 		Type genType = clazz.getGenericSuperclass();
 
@@ -284,13 +311,13 @@ public class Reflections {
 					+ params.length);
 			return Object.class;
 		}
-		if (!(params[index] instanceof Class)) {
+		if (!(params[index] instanceof Class<?>)) {
 			logger.warn(clazz.getSimpleName()
 					+ " not set the actual class on superclass generic parameter");
 			return Object.class;
 		}
 
-		return (Class) params[index];
+		return (Class<?>) params[index];
 	}
 
 	public static Class<?> getUserClass(Object instance) {
@@ -298,7 +325,7 @@ public class Reflections {
 			throw new IllegalArgumentException("Instance must not be null");
 		}
 		
-		Class clazz = instance.getClass();
+		Class<?> clazz = instance.getClass();
 		if (clazz != null && clazz.getName().contains(CGLIB_CLASS_SEPARATOR)) {
 			Class<?> superClass = clazz.getSuperclass();
 			if (superClass != null && !Object.class.equals(superClass)) {

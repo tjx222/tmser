@@ -15,10 +15,10 @@ import org.springframework.stereotype.Component;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import com.tmser.core.constants.ConsForSystem;
 import com.opensymphony.xwork2.inject.Inject;
 import com.opensymphony.xwork2.util.ClassLoaderUtil;
 import com.opensymphony.xwork2.util.ClassPathFinder;
+import com.tmser.core.config.Constants;
 
 /**
  * 导航配置加载
@@ -46,7 +46,7 @@ public class NavStrutsListener implements DispatcherListener{
 		Dispatcher.addDispatcherListener(this);
 	}
 	
-    @Inject(value=ConsForSystem.TSP_NAV_CONFIG,required=false)
+    @Inject(value=Constants.TSP_NAV_CONFIG,required=false)
     public void setNavConfig(String navConfig) {
     	this.navConfig = navConfig;
     }

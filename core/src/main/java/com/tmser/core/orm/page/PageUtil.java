@@ -1,4 +1,4 @@
-package com.tmser.core.page;
+package com.tmser.core.orm.page;
 
 import java.util.List;
 
@@ -25,8 +25,8 @@ public class PageUtil
 	 * @param page
 	 * @return
 	 */
-	public static <T>  PageList createPageList(List<T> list,Page page){
-		return new PageList(list,page);
+	public static <T>  PageList<T> createPageList(List<T> list,Page page){
+		return new PageList<T>(list,page);
 	}
 
 	/**
@@ -35,8 +35,8 @@ public class PageUtil
 	 * @param pageAware
 	 * @return
 	 */
-	public static <T>  PageList createPageList(List<T> list,PageAware pageAware){
-		return new PageList(list,pageAware.getPage());
+	public static <T>  PageList<T> createPageList(List<T> list,PageAble pageAble){
+		return new PageList<T>(list,pageAble.page());
 	}
 	
 	

@@ -1,30 +1,19 @@
 package com.tmser.core.bo;
 
-import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Transient;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-
-import com.tmser.core.page.Page;
-import com.tmser.core.page.PageAware;
 /**
  * 
  * 
  * @author tjx
  */
-public abstract class BaseObject implements PageAware,Serializable {
+public abstract class BaseObject extends QueryObject {
 	
 	private static final long serialVersionUID = 4237270095441710555L;
 
-	/**
-	 * 分页参数
-	 */
-	@Transient
-	private Page page = new Page();
-	
 	/**
 	 * 扩展属性
 	 */
@@ -36,12 +25,6 @@ public abstract class BaseObject implements PageAware,Serializable {
 	 */
 	@Transient
 	private String flago = "";
-	
-	/**
-	 * 自定义排序
-	 */
-	@Transient 
-	private String tspOrder;
 	
 	/**
 	 * 创建人Id
@@ -75,20 +58,6 @@ public abstract class BaseObject implements PageAware,Serializable {
 
 
 	/**
-	 * 自定义排序
-	 */
-	public String tspOrder() {
-		return tspOrder;
-	}
-
-	/**
-	 * 自定义排序
-	 */
-	public void setTspOrder(String tspOrder) {
-		this.tspOrder = tspOrder;
-	}
-
-	/**
 	 * 分页参数s
 	 */
 	public String getFlags() {
@@ -116,20 +85,6 @@ public abstract class BaseObject implements PageAware,Serializable {
 		this.flago = flago;
 	}
 
-	/**
-	 * 分页参数
-	 */
-	public Page getPage() {
-		return page;
-	}
-
-	/**
-	 * 分页参数
-	 */
-	public void setPage(Page page) {
-		this.page = page;
-	}
-	
 	/**
 	 * 创建时间
 	 */
@@ -200,25 +155,4 @@ public abstract class BaseObject implements PageAware,Serializable {
 		this.enableFlg = enableFlg;
 	}
 
-	/**
-	 * 设计分页参数
-	 * @param pageSize
-	 * @param currentPage
-	 */
-    public void pageParameter(int pageSize,int currentPage){
-    	if(page != null){
-    		page.reset(pageSize, currentPage);
-    	}
-    }
-
-
-	public String toString() {
-		return ToStringBuilder.reflectionToString(this);
-	}
-	
-	
-	public abstract boolean equals(Object obj);
-
-	public abstract int hashCode();
-	
 }

@@ -14,8 +14,8 @@ import java.util.zip.ZipOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.tmser.core.constants.GlobalConfig;
-import com.tmser.core.constants.GlobalConfig.Basepath;
+import com.tmser.core.config.GlobalConfig;
+import com.tmser.core.config.GlobalConfig.Basepath;
 
 /**
  * 文件操作工具类
@@ -469,8 +469,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 			byte[] buf = new byte[4096];
 			int readByte = 0;
 			// 获取ZIP文件里所有的entry
-			@SuppressWarnings("rawtypes")
-			Enumeration enums = zipFile.entries();
+			Enumeration<?> enums = zipFile.entries();
 			// 遍历所有entry
 			while (enums.hasMoreElements()) {
 				entry = (ZipEntry) enums.nextElement();

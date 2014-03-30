@@ -1,16 +1,15 @@
-package com.tmser.core.page;
+package com.tmser.core.orm.page;
 
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
-public class PageList implements Serializable {
+public class PageList<T> implements Serializable {
 	private static final long serialVersionUID = -6868950745522147470L;
-	@SuppressWarnings("rawtypes")
-	private List datalist;
+	private List<T> datalist;
 	private Page page;
 	private int startRecode;
-	private int nowData;
+	private boolean hasNext;
 
 	/**
 	 * 构造分页对象
@@ -20,27 +19,42 @@ public class PageList implements Serializable {
 	 * @param page
 	 *            分页信息 起始记录数，每页记录数，总记录数使用默认值
 	 */
-	public <T> PageList(List<T> datalist, Page page) {
+	public PageList(List<T> datalist, Page page) {
 		if (page == null)
 			throw new IllegalArgumentException("Page parameter can't be null");
-		this.datalist = datalist;
 		this.page = page;
+		if(datalist == null) 
+			throw new IllegalArgumentException("datalist parameter can't be null");
+		removeTail(datalist);
+		this.datalist = datalist;
 		this.startRecode = (getCurrentPage() - 1) * getPageSize();
 	}
 
-	@SuppressWarnings("unchecked")
-	public <T> List<T> getDatalist() {
-
+	public List<T> getDatalist() {
 		if (datalist == null) {
 			datalist = Collections.emptyList();
 		}
 		return datalist;
 	}
 
-	public <T> void setDatalist(List<T> datalist) {
+	protected void removeTail(List<T> datalist){
+		int size = datalist.size();
+		int pageSize = page.getPageSize();
+		if(size > pageSize )
+			hasNext = true;
+		else
+			hasNext = false;
+		
+		while(size > pageSize){
+			datalist.remove(size -1);
+			size = datalist.size();
+		}
+	}
+	public void setDatalist(List<T> datalist) {
 		if (datalist == null) {
 			throw new NullPointerException("datalist must not be null!");
 		}
+		removeTail(datalist);
 		this.datalist = datalist;
 	}
 
@@ -49,7 +63,7 @@ public class PageList implements Serializable {
 	 * 
 	 * @return
 	 */
-	public int getCurrentPageCount() {
+	public int currentPageCount() {
 		return datalist.size();
 	}
 
@@ -58,8 +72,9 @@ public class PageList implements Serializable {
 	 * 
 	 * @return
 	 */
-	public boolean isHasNextPage() {
-		return getCurrentPageCount() + (page.getCurrentPage() - 1)
+	
+	public boolean hasNextPage() {
+		return hasNext || currentPageCount() + (page.getCurrentPage() - 1)
 				* page.getPageSize() < page.getTotalCount();
 	}
 
@@ -68,14 +83,10 @@ public class PageList implements Serializable {
 	 * 
 	 * @return
 	 */
-	public boolean isHasPreviousPage() {
+	public boolean hasPreviousPage() {
 		return getCurrentPage() > 1;
 	}
 
-	public boolean isHasCyNextPage(){
-		return (getNowData() ==getPageSize()+1);
-	}
-	
 	/**
 	 * 获取当前页
 	 * 
@@ -90,7 +101,7 @@ public class PageList implements Serializable {
 	 * 
 	 * @return
 	 */
-	public int getNextPage() {
+	public int nextPage() {
 		return getCurrentPage() + 1;
 	}
 
@@ -99,7 +110,7 @@ public class PageList implements Serializable {
 	 * 
 	 * @return
 	 */
-	public int getPreviousPage() {
+	public int previousPage() {
 		if (getCurrentPage() == 1) {
 			return 1;
 		}
@@ -111,7 +122,7 @@ public class PageList implements Serializable {
 	 * 
 	 * @return
 	 */
-	public int getStartRecode() {
+	public int startRecode() {
 		if (getTotalCount() == 0) {
 			return 0;
 		}
@@ -124,8 +135,8 @@ public class PageList implements Serializable {
 	 * 
 	 * @return
 	 */
-	public int getEndOfCurPage() {
-		return startRecode + getCurrentPageCount();
+	public int endOfCurPage() {
+		return startRecode + currentPageCount();
 	}
 
 	/**
@@ -133,7 +144,7 @@ public class PageList implements Serializable {
 	 * 
 	 * @return
 	 */
-	public int getStartOfNextPage() {
+	public int startOfNextPage() {
 		return startRecode + getPageSize();
 	}
 
@@ -142,7 +153,7 @@ public class PageList implements Serializable {
 	 * 
 	 * @return
 	 */
-	public int getStartOfPreviousPage() {
+	public int startOfPreviousPage() {
 		return Math.max(startRecode - getPageSize(), 0);
 	}
 
@@ -151,7 +162,7 @@ public class PageList implements Serializable {
 	 * 
 	 * @return
 	 */
-	public int getStartOfLastPage() {
+	public int startOfLastPage() {
 		if (getTotalCount() % getPageSize() == 0) {
 			return getTotalCount() - getPageSize();
 		}
@@ -194,17 +205,8 @@ public class PageList implements Serializable {
 	 * @param page
 	 * @return
 	 */
-	public int getStartCount(int page) {
+	public int startCount(int page) {
 		return (page - 1) > 0 ? (page - 1) * getPageSize() : 0;
 	}
-
-	public int getNowData() {
-		return nowData;
-	}
-
-	public void setNowData(int nowData) {
-		this.nowData = nowData;
-	}
-
 	
 }

@@ -7,12 +7,12 @@ import org.apache.shiro.realm.Realm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.tmser.core.constants.ConsForSystem;
-import com.tmser.core.utils.CacheLoader;
+import com.tmser.core.config.DynamicConfig;
+
 
 /**
  * 
- * @author tjx
+ * @author tjx 
  * @date 2014-03-03
  * 
  */
@@ -20,13 +20,13 @@ public class RealmFactory {
 	
 	private static Logger log = LoggerFactory.getLogger(RealmFactory.class);
 	
+	private static final String CAS_SWITCH_KEY = "cas_switchKey";
+	
 	public static final String REALM_KEY_JDBC = "jdbc";
 	
 	public static final String REALM_KEY_CAS = "cas";
 	
-	private String casParamKey = ConsForSystem.SYS_PARAM_CAS;
-	
-	private String useCasKey = ConsForSystem.SYS_PARAM_CAS_SWITCH;
+	private String useCasKey = CAS_SWITCH_KEY;
 	
 	private boolean useCas;
 	
@@ -47,7 +47,7 @@ public class RealmFactory {
 	}
 	
 	public boolean isUseCas(){
-		String useCasString = CacheLoader.getCache(casParamKey,useCasKey,true).toString();
+		String useCasString = DynamicConfig.getConfig(useCasKey);
 		if("true".equalsIgnoreCase(useCasString) ||
 				"1".equalsIgnoreCase(useCasString)){
 			useCas = true;
@@ -64,10 +64,6 @@ public class RealmFactory {
 			log.info("Shiro Realm[{}] 初始化完成！",key);
 		}
 		return realm;
-	}
-
-	public void setCasParamKey(String casParamKey) {
-		this.casParamKey = casParamKey;
 	}
 
 	public void setUseCasKey(String useCasKey) {

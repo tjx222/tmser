@@ -24,7 +24,7 @@ import com.tmser.core.security.RoleFit;
  * @author tjx
  *
  */
-public class TspJDBCRealm extends AuthorizingRealm{
+public class TmserJDBCRealm extends AuthorizingRealm{
 	
 	private AccountService accountService;
 	/**

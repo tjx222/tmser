@@ -2,8 +2,9 @@ package com.tmser.core.orm;
 
 import java.util.List;
 
-import com.tmser.core.bo.BaseObject;
+import com.tmser.core.bo.QueryObject;
 import com.tmser.core.utils.StringUtils;
+
 
 /**
  * 字段名称获取器
@@ -20,17 +21,17 @@ public class ColumnObtainer {
 	 * @return
 	 */
 	public static class Builder {
-		private Class<? extends BaseObject> type;
+		private Class<? extends QueryObject> type;
 		
 		private String alias;
 		
 		private String split = ",";
 		
-		public Builder(Class<? extends BaseObject> type){
+		public Builder(Class<? extends QueryObject> type){
 			this.type = type;
 		}
 		
-		public Builder(Class<? extends BaseObject> type,String alias){
+		public Builder(Class<? extends QueryObject> type,String alias){
 			this.type = type;
 			this.alias = alias;
 		}
@@ -51,7 +52,7 @@ public class ColumnObtainer {
 	}
 	
 	
-	private Class<? extends BaseObject> type;
+	private Class<? extends QueryObject> type;
 	
 	private String alias;
 	
@@ -65,7 +66,7 @@ public class ColumnObtainer {
 		this.t = OrmHelper.getTable(type);
 	}
 	
-	public static Builder build(Class<? extends BaseObject> type){
+	public static Builder build(Class<? extends QueryObject> type){
 		return new Builder(type);
 	}
 	
@@ -175,7 +176,7 @@ public class ColumnObtainer {
 		return this.alias;
 	}
 	
-	public Class<? extends BaseObject> getType(){
+	public Class<? extends QueryObject> getType(){
 		return this.type;
 	}
 	

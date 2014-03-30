@@ -4,10 +4,10 @@ import java.io.ByteArrayInputStream;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.tmser.core.constants.ConsForSystem;
+import com.opensymphony.xwork2.ActionContext;
+import com.tmser.core.config.Constants;
 import com.tmser.core.utils.SecurityCode;
 import com.tmser.core.utils.SecurityImage;
-import com.opensymphony.xwork2.ActionContext;
 
 /**
  * 验证码控制层
@@ -38,7 +38,7 @@ public class RandomCodeAction extends BaseAction{
 		   imageStream = SecurityImage.getImageAsInputStream(securityCode);
 		   String sessionKey = codeSessionKey;
 		   if(StringUtils.isEmpty(sessionKey)){
-			   sessionKey = ConsForSystem.DEFAULT_SECURITY_CODE;
+			   sessionKey = Constants.DEFAULT_SECURITY_CODE;
 		   }
 		   //放入session中
 		   ActionContext.getContext().getSession()

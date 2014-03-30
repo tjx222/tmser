@@ -1,4 +1,4 @@
-package com.tmser.core.constants;
+package com.tmser.core.config;
 
 import java.io.File;
 import java.util.Properties;
@@ -89,7 +89,7 @@ public class GlobalConfig {
 	}
 	
 	public static String getDownloadRs(){
-		return getConfig(SYS_DOWNLOAD_RS,ConsForSystem.DEFUALT_DOWNLOAD_RS);
+		return getConfig(SYS_DOWNLOAD_RS,Constants.DEFUALT_DOWNLOAD_RS);
 	}
 	
 	/**

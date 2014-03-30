@@ -1,15 +1,8 @@
 package com.tmser.core.interceptor;
 
-import java.util.Map;
-
-import org.apache.struts2.ServletActionContext;
-import org.jasig.cas.client.authentication.AttributePrincipal;
-import org.jasig.cas.client.util.AbstractCasFilter;
-import org.jasig.cas.client.validation.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.tmser.core.utils.SpringContextHolder;
 import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.interceptor.AbstractInterceptor;
 

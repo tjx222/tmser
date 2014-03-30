@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.ScannedGenericBeanDefinition;
@@ -15,7 +16,7 @@ import org.springframework.core.type.AnnotationMetadata;
 
 import com.tmser.core.utils.Reflections;
 import com.tmser.core.utils.SpringContextHolder;
-import com.tmser.core.utils.StringUtils;
+
 
 /**
  * Orm 工具类

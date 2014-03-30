@@ -82,6 +82,15 @@ public class BaseAction extends ActionSupport {
 	}
 	
 	/**
+	 * 设置request
+	 * @param key
+	 * @param value
+	 */
+	protected Object getFromRequest(String key){
+		return ActionContext.getContext().get(key);
+	}
+	
+	/**
 	 * 设置session
 	 * @param key
 	 * @param value

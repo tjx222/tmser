@@ -1,14 +1,12 @@
-package com.tmser.core.service;
-
-import org.springframework.beans.factory.InitializingBean;
+package com.tmser.core.cache;
 
 /**
- * 应用缓存提供者
- * @author 张凯
- * @date 2014-1-18
  *
+ * @author tjx
+ * @version 2.0
+ * 2014-3-29
  */
-public interface AppCacheProvider extends InitializingBean{
+public interface Cache {
 
 	/**
 	 * 根据缓存类型获取缓存对象

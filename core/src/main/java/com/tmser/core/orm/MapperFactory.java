@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.tmser.core.bo.BaseObject;
+import com.tmser.core.bo.QueryObject;
 
 /**
  * Mapper 工厂
@@ -17,13 +17,13 @@ import com.tmser.core.bo.BaseObject;
  */
 public class MapperFactory {
  
-	private final static Map<Class<?>,TspMapper<?>> MAPPERS = new HashMap<Class<?>,TspMapper<?>>();
+	private final static Map<Class<?>,TmserMapper<?>> MAPPERS = new HashMap<Class<?>,TmserMapper<?>>();
 	/**
 	 * 根据bo类型创建 TspMapper
 	 * @param c
 	 * @return
 	 */
-	public static <T extends BaseObject> TspMapper<T> create(Class<T> c){
+	public static <T extends QueryObject> TmserMapper<T> create(Class<T> c){
 		return  getMapper(c);
 	}
 	
@@ -32,17 +32,17 @@ public class MapperFactory {
 	 * @param entity
 	 * @return
 	 */
-	public static <T extends BaseObject> TspMapper<T> getMapper(
-			final Class<? extends BaseObject> entity) {
-		TspMapper<T> mapper = (TspMapper<T>) MAPPERS.get(entity);
+	@SuppressWarnings("unchecked")
+	public static <T extends QueryObject> TmserMapper<T> getMapper(
+			final Class<? extends QueryObject> entity) {
+		TmserMapper<T> mapper = (TmserMapper<T>) MAPPERS.get(entity);
 		if(mapper != null){
 			return mapper;
 		}
 		
 		synchronized(MAPPERS){
 			if(mapper == null){
-				mapper = new TspMapper<T>() {
-					@SuppressWarnings("unchecked")
+				mapper = new TmserMapper<T>() {
 					@Override
 					public T map(ResultSet rs, int rowNum) throws SQLException {
 						T bo = (T) OrmHelper.getEntity(entity);

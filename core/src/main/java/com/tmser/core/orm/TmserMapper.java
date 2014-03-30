@@ -12,7 +12,7 @@ import org.springframework.jdbc.core.RowMapper;
  * @version 2.0
  * 2014-1-24
  */
-public abstract class TspMapper<T> implements RowMapper<T>{
+public abstract class TmserMapper<T> implements RowMapper<T>{
 	/**
 	 * {@inheritDoc}
 	 */

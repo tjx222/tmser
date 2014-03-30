@@ -23,22 +23,24 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 
-import com.tmser.core.bo.BaseObject;
-import com.tmser.core.constants.ConsForSystem;
+import com.tmser.core.bo.QueryObject;
+import com.tmser.core.config.Constants;
 import com.tmser.core.exception.PersistentNotSetException;
 import com.tmser.core.orm.Column;
+import com.tmser.core.orm.ColumnObtainer;
 import com.tmser.core.orm.MapperAware;
 import com.tmser.core.orm.MapperContainer;
 import com.tmser.core.orm.MapperFactory;
 import com.tmser.core.orm.Table;
-import com.tmser.core.orm.TspMapper;
+import com.tmser.core.orm.TmserMapper;
 import com.tmser.core.orm.ValidateAbleSqlParameterSource;
+import com.tmser.core.orm.page.Page;
+import com.tmser.core.orm.page.PageList;
+import com.tmser.core.orm.page.PageUtil;
 import com.tmser.core.orm.search.SearchSqlHelper;
-import com.tmser.core.page.Page;
-import com.tmser.core.page.PageList;
-import com.tmser.core.page.PageUtil;
 import com.tmser.core.utils.Reflections;
 import com.tmser.core.utils.StringUtils;
+
 
 /**
  * 抽象DAO
@@ -50,8 +52,8 @@ import com.tmser.core.utils.StringUtils;
  * @version 2.0
  * 2014-1-15
  */
-@DependsOn(ConsForSystem.TSP_MAPPER_CONTAINER)
-public abstract class AbstractDAO<E extends BaseObject, K extends Serializable>
+@DependsOn(Constants.TSP_MAPPER_CONTAINER)
+public abstract class AbstractDAO<E extends QueryObject, K extends Serializable>
 		implements BaseDAO<E, K>, MapperAware ,InitializingBean{
 
 	protected final Logger log = LoggerFactory.getLogger(getClass());
@@ -60,7 +62,7 @@ public abstract class AbstractDAO<E extends BaseObject, K extends Serializable>
 	 * ORM 配置容器
 	 */
 	@Autowired
-	@Qualifier(ConsForSystem.TSP_MAPPER_CONTAINER)
+	@Qualifier(Constants.TSP_MAPPER_CONTAINER)
 	protected MapperContainer mapperContainer;
 
 	private Table table;
@@ -76,7 +78,7 @@ public abstract class AbstractDAO<E extends BaseObject, K extends Serializable>
 
 	protected SimpleJdbcCall simpleJdbcCall;
 	
-	protected TspMapper<E> mapper;
+	protected TmserMapper<E> mapper;
 
 	private Class<E> entity;
 
@@ -102,6 +104,20 @@ public abstract class AbstractDAO<E extends BaseObject, K extends Serializable>
 	}
 	
 	/**
+	 * bean 初始化方法
+	 */
+	public void afterPropertiesSet(){
+		this.table = mapperContainer.getTable(entity.getName());
+		this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(
+				this.jdbcTemplate);
+		this.simpleJdbcInsert = new SimpleJdbcInsert(this.jdbcTemplate)
+		.withTableName(this.getTable().getTableName())
+		.usingGeneratedKeyColumns(table.getPkName());
+		this.simpleJdbcCall = new SimpleJdbcCall(this.jdbcTemplate);
+		this.mapper = MapperFactory.getMapper(entity);
+	}
+	
+	/**
 	 * 设置批量操作是，批量操作分页的最小记录数
 	 * @param pageSize
 	 */
@@ -111,7 +127,6 @@ public abstract class AbstractDAO<E extends BaseObject, K extends Serializable>
 
 	/**
 	 * 使用datasource 初始化template 与setJdbcTemplate 只有一个生效
-	 * 
 	 */
 	public void setDataSource(DataSource dataSource) {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
@@ -135,8 +150,13 @@ public abstract class AbstractDAO<E extends BaseObject, K extends Serializable>
 	public E get(K id) {
 		StringBuilder sqlStr = new StringBuilder("select * from ").append(
 				getTable().getTableName()).append(" where ").append(table.getPkName()).append(" = ?");
-		return jdbcTemplate.queryForObject(sqlStr.toString(),
-				new Object[] { id }, mapper);
+		E e = null;
+		try {
+			e = jdbcTemplate.queryForObject(sqlStr.toString(), new Object[] { id }, mapper);
+		} catch (IncorrectResultSizeDataAccessException e1) {
+			//do nothing
+		}
+		return e;
 	}
 
 	/**
@@ -183,24 +203,8 @@ public abstract class AbstractDAO<E extends BaseObject, K extends Serializable>
 	}
 	
 	/**
-	 * 将参数列表插入到数据库中
-	 * @param updateList 插入列表
-	 * @param inserActor 指定的插入执行器
-	 */
-	private void insertSqlParameterSourceInfoDB(List<E> updateList){
-		SqlParameterSource[] paramSources = new SqlParameterSource[updateList.size()];
-		int index = 0;
-		for(E e : updateList){
-			SqlParameterSource paramSource = new ValidateAbleSqlParameterSource(e,getTable());
-			paramSources[index++] = paramSource;
-		}
-		
-		simpleJdbcInsert.executeBatch(paramSources);
-	}
-	
-	/**
 	 * 更新对象
-	 * 根据传递对象的主键更新对象。
+	 * 根据传递对象的主键更新对象。null 属性不更新
 	 * 要求model 对应表必须设置了主键并正确的注解了，并且model 主键值不能为空
 	 * 
 	 */
@@ -217,7 +221,37 @@ public abstract class AbstractDAO<E extends BaseObject, K extends Serializable>
 
 		Map<String, Object> paramMap = new HashMap<String, Object>();
 		
-		String qs = compileUpdateParams(table,model,paramMap);
+		String qs = compileUpdateParams(table,model,paramMap,true);
+		if(qs == null){
+			log.info("model :" +model +"  no need to update");
+			return;
+		}
+		sqlStr.append(qs);
+		if(log.isDebugEnabled()) {
+			log.debug(sqlStr.toString());
+		}
+		getNamedParameterJdbcTemplate().update(sqlStr.toString(), paramMap);
+	}
+	
+	/**
+	 * 更新对象,null 值不过滤。
+	 * 根据传递对象的主键更新对象。
+	 * 要求model 对应表必须设置了主键并正确的注解了，并且model 主键值不能为空
+	 * 
+	 */
+	protected void updateWithNullValue(final E model) throws IllegalArgumentException{
+		if(table.getPkName() == null){
+			throw new IllegalArgumentException("This table doesn't have a PK column!");
+		}
+		
+		assertNotNull(model,"The object for update ");
+		
+		StringBuilder sqlStr = new StringBuilder("update ");
+		sqlStr.append(table.getTableName()).append(" set ");
+
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		
+		String qs = compileUpdateParams(table,model,paramMap,false);
 		if(qs == null){
 			log.info("model :" +model +"  no need to update");
 			return;
@@ -233,13 +267,18 @@ public abstract class AbstractDAO<E extends BaseObject, K extends Serializable>
 	 * 分页查询
 	 * 
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
-	public PageList listPage(E model) {
-		StringBuilder sqlStr = new StringBuilder("select * from ");
-		sqlStr.append(table.getTableName())	.append(" where 1=1 ");
+	public PageList<E> listPage(E model) {
+		assertNotNull(model, "model");
+		ColumnObtainer contain = ColumnObtainer.build(model.getClass()).newInstance();
+		String customCulomn = model.customCulomn();
+		String searchColumn = StringUtils.isBlank(customCulomn)? "*" :
+			SearchSqlHelper.parseHalfSql(customCulomn.trim(), contain);
+		StringBuilder sqlStr = new StringBuilder("select ")
+			.append(searchColumn).append(" from ")
+			.append(table.getTableName()).append(" where 1=1 ");
 		
-		Page page =(Page) Reflections.getFieldValue(model, "page");
+		Page page = model.page();
 		
 		Map<String, Object> paramMap = new HashMap<String, Object>();
 		
@@ -248,12 +287,14 @@ public abstract class AbstractDAO<E extends BaseObject, K extends Serializable>
 		sqlStr.append(compileQureyParams(columns,model,paramMap));
 		
 		if(page.needTotal())
-			 page.setTotalCount(countByNamedSql(sqlStr.toString(),paramMap));
+			 page.setTotalCount(getTotalCountByNamedParams(sqlStr.toString(),paramMap));
 		
 		//排序
-		String order =(String) Reflections.getFieldValue(model, "tspOrder");
+		String order = model.order();
+				
 		if(StringUtils.isNotBlank(order)){
-			sqlStr.append(" order by ").append(SearchSqlHelper.parseSql(order, model.getClass()));
+			sqlStr.append(" order by ").append(SearchSqlHelper.parseHalfSql(order, 
+					contain));
 		}
 		
 		// 获取分页sql
@@ -262,12 +303,12 @@ public abstract class AbstractDAO<E extends BaseObject, K extends Serializable>
 		// 查询
 		List<E> resultList = namedParameterJdbcTemplate.query(sql, paramMap, mapper);
 		if(log.isDebugEnabled()) {
-			log.debug(sql);
+			log.debug("sql:{},param:{}",sql,paramMap);
 		}
-		return new PageList(resultList,page);
+		return new PageList<E>(resultList,page);
 	}
 	
-
+	
 	/**
 	 * 按模型查询，并限制结果条数
 	 * @param model 查询模型
@@ -277,8 +318,37 @@ public abstract class AbstractDAO<E extends BaseObject, K extends Serializable>
 	@Override
 	public List<E> list(E model,int limit) {
 		assertNotNull(model, "model");
-		Reflections.invokeSetter(model, "page", new Page(limit,false));
-		return listPage(model).getDatalist();
+		//查询字段
+		ColumnObtainer contain = ColumnObtainer.build(model.getClass()).newInstance();
+		String customCulomn = model.customCulomn();
+		String searchColumn = StringUtils.isBlank(customCulomn) ? "*" :
+			SearchSqlHelper.parseHalfSql(customCulomn.trim(), contain);
+		
+		StringBuilder sqlStr = new StringBuilder("select ")
+			.append(searchColumn).append(" from ")
+			.append(table.getTableName()).append(" where 1=1 ");
+		
+		Page page = new Page(limit-1,false);
+		
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		
+		List<Column> columns = table.getColumns();
+		
+		sqlStr.append(compileQureyParams(columns,model,paramMap));
+		
+		//排序
+		String order = model.order();
+		if(StringUtils.isNotBlank(order)){
+			sqlStr.append(" order by ").append(SearchSqlHelper.parseHalfSql(order, contain));
+		}
+		
+		String sql = PageUtil.gernatePageSql(sqlStr.toString(), page);
+		
+		// 查询
+		if(log.isDebugEnabled()) {
+			log.debug(sql);
+		}
+		return namedParameterJdbcTemplate.query(sql, paramMap, mapper);
 	}
 	
 	/**
@@ -288,9 +358,7 @@ public abstract class AbstractDAO<E extends BaseObject, K extends Serializable>
 	 */
 	@Override
 	public List<E> listAll(E model) {
-		assertNotNull(model, "model");
-		Reflections.invokeSetter(model, "page", new Page(Integer.MAX_VALUE,false));
-		return listPage(model).getDatalist();
+		return list(model,Integer.MAX_VALUE);
 	}
 	
 	
@@ -310,10 +378,10 @@ public abstract class AbstractDAO<E extends BaseObject, K extends Serializable>
 		
 		sqlStr.append(compileQureyParams(columns,model,paramMap));
 		
-		return countByNamedSql(sqlStr.toString(),paramMap);
+		return getTotalCountByNamedParams(sqlStr.toString(),paramMap);
 	}
 	
-	public TspMapper<E> getMapper() {
+	public TmserMapper<E> getMapper() {
 		return mapper;
 	}
 	
@@ -465,16 +533,16 @@ public abstract class AbstractDAO<E extends BaseObject, K extends Serializable>
 	 * 
 	 * @param sql 要执行的sql
 	 * @param args 参数列表
-	 * @param TspMapper 自己类型转换器
+	 * @param TmserMapper 自己类型转换器
 	 * @return
 	 * @throws DataAccessException
 	 */
-	protected <T> List<T> query(String sql, Object[] args, TspMapper<T> TspMapper) throws DataAccessException {
+	protected <T> List<T> query(String sql, Object[] args, TmserMapper<T> TmserMapper) throws DataAccessException {
 		assertNotNull(sql,"query sql");
 		if(log.isDebugEnabled()) {
 			log.debug("sql:" + sql +","+ argsToString(args));
 		}
-		return getJdbcTemplate().query(sql, args, TspMapper);
+		return getJdbcTemplate().query(sql, args, TmserMapper);
 	}
 	
 	/**
@@ -483,7 +551,7 @@ public abstract class AbstractDAO<E extends BaseObject, K extends Serializable>
 	 * 
 	 * @param sql 要执行的sql
 	 * @param args 参数列表
-	 * @param TspMapper 自己类型转换器
+	 * @param TmserMapper 自己类型转换器
 	 * @return map 结果map列表
 	 * @throws DataAccessException
 	 */
@@ -502,12 +570,12 @@ public abstract class AbstractDAO<E extends BaseObject, K extends Serializable>
 	 * 
 	 * @param sql 要执行的sql
 	 * @param args 参数列表
-	 * @param TspMapper 自己类型转换器
+	 * @param TmserMapper 自己类型转换器
 	 * @return
 	 * @throws DataAccessException
 	 */
-	protected <T> T queryForSingle(String sql, Object[] args, TspMapper<T> TspMapper) throws DataAccessException {
-		List<T> rs = query(sql, args, TspMapper);
+	protected <T> T queryForSingle(String sql, Object[] args, TmserMapper<T> TmserMapper) throws DataAccessException {
+		List<T> rs = query(sql, args, TmserMapper);
 		if(rs != null && rs.size() > 0){
 			return rs.get(0);
 		}
@@ -520,16 +588,21 @@ public abstract class AbstractDAO<E extends BaseObject, K extends Serializable>
 	 * 
 	 * @param sql 要执行的sql
 	 * @param args sql 中的参数名值对
-	 * @param TspMapper 自己类型转换器
+	 * @param TmserMapper 自己类型转换器
 	 * @return
 	 * @throws DataAccessException
 	 */
-	protected <T> List<T> queryByNamedSql(String sql,Map<String,Object> args, TspMapper<T> TspMapper) throws DataAccessException {
+	protected <T> List<T> queryByNamedSql(String sql,Map<String,Object> args, TmserMapper<T> TmserMapper) throws DataAccessException {
 		assertNotNull(sql,"query sql");
 		if(log.isDebugEnabled()) {
 			log.debug("sql:" + sql+","+ argsToString(args));
 		}
-		return getNamedParameterJdbcTemplate().query(sql, args, TspMapper);
+		try{
+			return getNamedParameterJdbcTemplate().query(sql, args, TmserMapper);
+		}catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException();
+		}
 	}
 	
 	
@@ -539,12 +612,15 @@ public abstract class AbstractDAO<E extends BaseObject, K extends Serializable>
 	 * 
 	 * @param sql 要执行的sql
 	 * @param args sql 中的参数名值对
-	 * @param TspMapper 自己类型转换器
+	 * @param TmserMapper 自己类型转换器
 	 * @return
 	 * @throws DataAccessException
 	 */
-	protected <T>T queryByNamedSqlForSingle(String sql,Map<String,Object> args, TspMapper<T> TspMapper) throws DataAccessException {
-		List<T> rs = queryByNamedSql(sql, args, TspMapper);
+	protected <T>T queryByNamedSqlForSingle(String sql,Map<String,Object> args, TmserMapper<T> TmserMapper) throws DataAccessException {
+		if(log.isDebugEnabled()) {
+			log.debug("sql:" + sql+","+ argsToString(args));
+		}
+		List<T> rs = queryByNamedSql(sql, args, TmserMapper);
 		if(rs != null && rs.size() > 0){
 			return rs.get(0);
 		}
@@ -576,14 +652,14 @@ public abstract class AbstractDAO<E extends BaseObject, K extends Serializable>
 	 * 
 	 * @param sql 要执行的sql
 	 * @param args 参数列表
-	 * @param TspMapper 自己类型转换器
+	 * @param TmserMapper 自己类型转换器
 	 * @return
 	 * @throws DataAccessException
 	 */
-	protected <T> List<T> queryWithLimit(String sql, Object[] args, TspMapper<T> TspMapper,int limit) throws DataAccessException {
+	protected <T> List<T> queryWithLimit(String sql, Object[] args, TmserMapper<T> TmserMapper,int limit) throws DataAccessException {
 		assertNotNull(sql,"query sql");
-		String wrapperSql = PageUtil.gernatePageSql(sql, new Page(limit));
-		return query(wrapperSql, args, TspMapper);
+		String wrapperSql = PageUtil.gernatePageSql(sql, new Page(limit-1,false));
+		return query(wrapperSql, args, TmserMapper);
 	}
 	
 	/**
@@ -597,7 +673,7 @@ public abstract class AbstractDAO<E extends BaseObject, K extends Serializable>
 	 */
 	protected List<Map<String,Object>> queryWithLimit(String sql, Object[] args,int limit) throws DataAccessException {
 		assertNotNull(sql,"query sql");
-		String wrapperSql = PageUtil.gernatePageSql(sql, new Page(limit));
+		String wrapperSql = PageUtil.gernatePageSql(sql, new Page(limit-1,false));
 		return query(wrapperSql, args);
 	}
 	
@@ -607,14 +683,14 @@ public abstract class AbstractDAO<E extends BaseObject, K extends Serializable>
 	 * 
 	 * @param sql 要执行的sql
 	 * @param args sql 中的参数名值对
-	 * @param TspMapper 自己类型转换器
+	 * @param TmserMapper 自己类型转换器
 	 * @return
 	 * @throws DataAccessException
 	 */
-	protected <T> List<T> queryByNamedSqlWithLimit(String sql,Map<String,Object> args, TspMapper<T> TspMapper,int limit) throws DataAccessException {
+	protected <T> List<T> queryByNamedSqlWithLimit(String sql,Map<String,Object> args, TmserMapper<T> TmserMapper,int limit) throws DataAccessException {
 		assertNotNull(sql,"query sql");
-		String wrapperSql = PageUtil.gernatePageSql(sql, new Page(limit));
-		return queryByNamedSql(wrapperSql, args, TspMapper);
+		String wrapperSql = PageUtil.gernatePageSql(sql, new Page(limit-1,false));
+		return queryByNamedSql(wrapperSql, args, TmserMapper);
 	}
 	
 	
@@ -624,13 +700,13 @@ public abstract class AbstractDAO<E extends BaseObject, K extends Serializable>
 	 * 
 	 * @param sql 要执行的sql
 	 * @param args sql 中的参数名值对
-	 * @param TspMapper 自己类型转换器
+	 * @param TmserMapper 自己类型转换器
 	 * @return
 	 * @throws DataAccessException
 	 */
 	protected List<Map<String,Object>> queryByNamedSqlWithLimit(String sql,Map<String,Object> args, int limit) throws DataAccessException {
 		assertNotNull(sql,"query sql");
-		String wrapperSql = PageUtil.gernatePageSql(sql, new Page(limit));
+		String wrapperSql = PageUtil.gernatePageSql(sql, new Page(limit-1,false));
 		return queryByNamedSql(wrapperSql, args);
 	}
 	
@@ -641,16 +717,16 @@ public abstract class AbstractDAO<E extends BaseObject, K extends Serializable>
 	 * 
 	 * @param sql 要执行的sql
 	 * @param args 参数列表
-	 * @param TspMapper 自己类型转换器
+	 * @param TmserMapper 自己类型转换器
 	 * @return
 	 * @throws DataAccessException
 	 */
-	protected <T> PageList queryPage(String sql, Object[] args, TspMapper<T> TspMapper,final Page pageInfo) throws DataAccessException {
+	protected <T> PageList<T> queryPage(String sql, Object[] args, TmserMapper<T> TmserMapper,final Page pageInfo) throws DataAccessException {
 		assertNotNull(sql,"query sql");
 		String wrapperSql = PageUtil.gernatePageSql(sql,pageInfo);
 		if(pageInfo.needTotal())
-			 pageInfo.setTotalCount(count(sql,args));
-		return new PageList(query(wrapperSql, args, TspMapper),pageInfo);
+			 pageInfo.setTotalCount(getTotalCount(sql,args));
+		return new PageList<T>(query(wrapperSql, args, TmserMapper),pageInfo);
 	}
 	
 	
@@ -660,16 +736,16 @@ public abstract class AbstractDAO<E extends BaseObject, K extends Serializable>
 	 * 
 	 * @param sql 要执行的sql
 	 * @param args 参数列表
-	 * @param TspMapper 自己类型转换器
+	 * @param TmserMapper 自己类型转换器
 	 * @return 分页的map
 	 * @throws DataAccessException
 	 */
-	protected PageList queryPage(String sql, Object[] args,final Page pageInfo) throws DataAccessException {
+	protected PageList<Map<String,Object>> queryPage(String sql, Object[] args,final Page pageInfo) throws DataAccessException {
 		assertNotNull(sql,"query sql");
 		String wrapperSql = PageUtil.gernatePageSql(sql,pageInfo);
 		if(pageInfo.needTotal())
-			 pageInfo.setTotalCount(count(sql,args));
-		return new PageList(query(wrapperSql, args),pageInfo);
+			 pageInfo.setTotalCount(getTotalCount(sql,args));
+		return new PageList<Map<String,Object>>(query(wrapperSql, args),pageInfo);
 	}
 	
 	/**
@@ -678,20 +754,20 @@ public abstract class AbstractDAO<E extends BaseObject, K extends Serializable>
 	 * 
 	 * @param sql 要执行的sql
 	 * @param args sql 中的参数名值对
-	 * @param TspMapper 自己类型转换器
+	 * @param TmserMapper 自己类型转换器
 	 * @return
 	 * @throws DataAccessException
 	 */
-	protected <T> PageList queryPageByNamedSql(String sql,Map<String,Object> args, TspMapper<T> TspMapper,Page pageInfo) throws DataAccessException {
+	protected <T> PageList<T> queryPageByNamedSql(String sql,Map<String,Object> args, TmserMapper<T> TmserMapper,Page pageInfo) throws DataAccessException {
 		assertNotNull(sql,"query sql");
 		String wrapperSql = PageUtil.gernatePageSql(sql, pageInfo);
 		if(log.isDebugEnabled()) {
 			log.debug("sql:" + wrapperSql+","+ argsToString(args));
 		}
 		 if(pageInfo.needTotal()) {
-			 pageInfo.setTotalCount(countByNamedSql(sql,args));
+			 pageInfo.setTotalCount(getTotalCountByNamedParams(sql,args));
 		 }
-		return new PageList(getNamedParameterJdbcTemplate().query(wrapperSql, args, TspMapper),pageInfo);
+		return new PageList<T>(getNamedParameterJdbcTemplate().query(wrapperSql, args, TmserMapper),pageInfo);
 	}
 	
 	
@@ -701,20 +777,20 @@ public abstract class AbstractDAO<E extends BaseObject, K extends Serializable>
 	 * 
 	 * @param sql 要执行的sql
 	 * @param args sql 中的参数名值对
-	 * @param TspMapper 自己类型转换器
+	 * @param TmserMapper 自己类型转换器
 	 * @return 分页的map
 	 * @throws DataAccessException
 	 */
-	protected PageList queryPageByNamedSql(String sql,Map<String,Object> args, Page pageInfo) throws DataAccessException {
+	protected PageList<Map<String,Object>> queryPageByNamedSql(String sql,Map<String,Object> args, Page pageInfo) throws DataAccessException {
 		assertNotNull(sql,"query sql");
 		String wrapperSql = PageUtil.gernatePageSql(sql, pageInfo);
 		if(log.isDebugEnabled()) {
 			log.debug("sql:" + wrapperSql+","+ argsToString(args));
 		}
 		 if(pageInfo.needTotal()) {
-			 pageInfo.setTotalCount(countByNamedSql(sql,args));
+			 pageInfo.setTotalCount(getTotalCountByNamedParams(sql,args));
 		 }
-		return new PageList(queryByNamedSql(wrapperSql, args),pageInfo);
+		return new PageList<Map<String,Object>>(queryByNamedSql(wrapperSql, args),pageInfo);
 	}
 	
 	/**
@@ -747,20 +823,6 @@ public abstract class AbstractDAO<E extends BaseObject, K extends Serializable>
 	}
 	
 	/**
-	 * 
-	 */
-	public void afterPropertiesSet(){
-		this.table = mapperContainer.getTable(entity.getName());
-		this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(
-				this.jdbcTemplate);
-		this.simpleJdbcInsert = new SimpleJdbcInsert(this.jdbcTemplate)
-		.withTableName(this.getTable().getTableName())
-		.usingGeneratedKeyColumns(table.getPkName());
-		this.simpleJdbcCall = new SimpleJdbcCall(this.jdbcTemplate);
-		this.mapper = MapperFactory.getMapper(entity);
-	}
-	
-	/**
 	 * 初始化获取泛型具体类型
 	 */
 	@SuppressWarnings("unchecked")
@@ -782,6 +844,16 @@ public abstract class AbstractDAO<E extends BaseObject, K extends Serializable>
 			log.info("init DAO " + getClass().getName() + ", entity is ["
 					+ this.entity.getName() + "]");
 		}
+	}
+	
+	private int getTotalCount(String sql,Object... args){
+		String countSql = "select count(0) from (" + sql + ") as total";
+		return count(countSql, args);
+	}
+	
+	private int getTotalCountByNamedParams(String sql,Map<String,Object> args){
+		String countSql = "select count(0) from (" + sql + ") as total";
+		return countByNamedSql(countSql, args);
 	}
 
 	private void assertNotNull(Object e,String name) {
@@ -836,13 +908,28 @@ public abstract class AbstractDAO<E extends BaseObject, K extends Serializable>
 	}
 	
 	/**
+	 * 将参数列表插入到数据库中
+	 * @param updateList 插入列表
+	 */
+	private void insertSqlParameterSourceInfoDB(List<E> updateList){
+		SqlParameterSource[] paramSources = new SqlParameterSource[updateList.size()];
+		int index = 0;
+		for(E e : updateList){
+			SqlParameterSource paramSource = new ValidateAbleSqlParameterSource(e,getTable());
+			paramSources[index++] = paramSource;
+		}
+		
+		simpleJdbcInsert.executeBatch(paramSources);
+	}
+	
+	/**
 	 * 以传人对象做模型，拼接更新
 	 * @param table
 	 * @param model
 	 * @param paramMap
 	 * @return
 	 */
-	private String compileUpdateParams(Table table,E model,Map<String,Object> paramMap){
+	private String compileUpdateParams(Table table,E model,Map<String,Object> paramMap,boolean filterNull){
 		String pkColumn = table.getPkName();
 		String pkName = table.getColumn(pkColumn).getName();
 		Object pkValue = Reflections.getFieldValue(model,pkName);
@@ -857,7 +944,7 @@ public abstract class AbstractDAO<E extends BaseObject, K extends Serializable>
 			if(column.isPK())
 				continue;
 			Object value = Reflections.getFieldValue(model, column.getName());
-			if(value != null){
+			if(filterNull && value != null){
 				if(queryParams.length() > 0)
 					queryParams.append(", ");
 				queryParams.append(column.getColumn())

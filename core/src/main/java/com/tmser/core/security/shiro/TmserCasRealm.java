@@ -8,10 +8,9 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.cas.CasRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 
-import com.tmser.core.constants.ConsForSystem;
+import com.tmser.core.config.DynamicConfig;
 import com.tmser.core.security.PermissionFit;
 import com.tmser.core.security.RoleFit;
-import com.tmser.core.utils.CacheLoader;
 
 
 /**
@@ -19,7 +18,10 @@ import com.tmser.core.utils.CacheLoader;
  * @author tjx
  * 2014-03-01
  */
-public class TspCasRealm extends CasRealm{
+public class TmserCasRealm extends CasRealm{
+	
+	private static final String CAS_SERVICE_URL_KEY = "cas_serviceUrlKey";
+	private static final String CAS_SERVICE_KEY = "cas_serviceKey";
 	/**
 	 * 权限获取器
 	 */
@@ -30,11 +32,9 @@ public class TspCasRealm extends CasRealm{
 	 */
 	private RoleFit roleFit;
 	
-	private String casParamKey = ConsForSystem.SYS_PARAM_CAS;
+	private String casServerUrlPrefixKey = CAS_SERVICE_URL_KEY;
 	
-	private String casServerUrlPrefixKey = ConsForSystem.SYS_PARAM_WSDL_CAS;
-	
-	private String casServiceKey = ConsForSystem.SYS_PARAM_CAS_SERVICE_URL;
+	private String casServiceKey = CAS_SERVICE_KEY;
 	
 	/**
 	 * 授权信息
@@ -73,12 +73,12 @@ public class TspCasRealm extends CasRealm{
 	
 	@Override
     public String getCasServerUrlPrefix() {
-        return CacheLoader.getCache(casParamKey, casServerUrlPrefixKey ,true).toString();
+        return DynamicConfig.getConfig(casServerUrlPrefixKey);
     }
 
     @Override
     public String getCasService() {
-    	return CacheLoader.getCache(casParamKey, casServiceKey, true).toString();
+    	return DynamicConfig.getConfig(casServiceKey);
     }
 
 	public void setPermissionFit(PermissionFit permissionFit) {
@@ -95,10 +95,6 @@ public class TspCasRealm extends CasRealm{
 
 	public void setCasServiceKey(String casServiceKey) {
 		this.casServiceKey = casServiceKey;
-	}
-
-	public void setCasParamKey(String casParamKey) {
-		this.casParamKey = casParamKey;
 	}
 
 }

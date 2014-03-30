@@ -3,8 +3,8 @@ package com.tmser.core.dao;
 import java.io.Serializable;
 import java.util.List;
 
-import com.tmser.core.orm.TspMapper;
-import com.tmser.core.page.PageList;
+import com.tmser.core.orm.TmserMapper;
+import com.tmser.core.orm.page.PageList;
 
 /**
  * 
@@ -53,7 +53,7 @@ public interface BaseDAO<E, K extends Serializable> {
 	 *            查询条件
 	 * @return 结果集合
 	 */
-	PageList listPage(E model);
+	PageList<E> listPage(E model);
 
 	/**
 	 * 根据模板对象分页查询,并限制结果数
@@ -91,7 +91,7 @@ public interface BaseDAO<E, K extends Serializable> {
 	 * 获取当前BO 的映射
 	 * 
 	 */
-	TspMapper<E> getMapper();
+	TmserMapper<E> getMapper();
 	
 	/**
 	 * 批量插入

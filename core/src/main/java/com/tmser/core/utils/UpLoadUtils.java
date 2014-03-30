@@ -11,8 +11,8 @@ import java.io.OutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.tmser.core.constants.GlobalConfig;
-import com.tmser.core.constants.GlobalConfig.Basepath;
+import com.tmser.core.config.GlobalConfig;
+import com.tmser.core.config.GlobalConfig.Basepath;
 
 
 /**

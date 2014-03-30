@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.tmser.core.bo.BaseObject;
 import com.tmser.core.orm.ColumnObtainer;
 
+
 /**
  * sql 语句解析器
  * 
@@ -27,15 +28,15 @@ public class SearchSqlHelper {
 	
 	public static final String TABLE_PRFIX = "@";
 	
-	static final String DEFAULT_ALIAS = "default";
+	static final String DEFAULT_ALIAS = "__default";
 	
 	static final String AS = "as";
 	
-	static final Pattern COLUMN_PATTERN = Pattern.compile("#[a-zA-Z]*\\.?[a-zA-Z_]+");
+	static final Pattern COLUMN_PATTERN = Pattern.compile("#([a-zA-Z_]+\\.)?[a-zA-Z_]+");
 	
-	static final Pattern TABLE_PATTERN = Pattern.compile("@[a-zA-Z.]*[a-zA-Z]+");
+	static final Pattern TABLE_PATTERN = Pattern.compile("@([a-zA-Z_]+\\.)?[a-zA-Z]+");
 	
-	static final Pattern TABLE_ALAIS_PATTERN = Pattern.compile("@[a-zA-Z.]*[a-zA-Z]+\\s*[a-zA-Z]*\\s*[a-zA-Z_]*");
+	static final Pattern TABLE_ALAIS_PATTERN = Pattern.compile("@([a-zA-Z_]+\\.)?[a-zA-Z]+\\s*[a-zA-Z]*\\s*[a-zA-Z_]*");
 	
 	static final List<String> SQLWORDS = new ArrayList<String>();
 	
@@ -85,7 +86,7 @@ public class SearchSqlHelper {
 	/**
 	 * 解析中变量名
 	 * 
-	 * @param sql 要解析的sql
+	 * @param sql 要解析的sql,要求是完整的sql
 	 * @param clsess 栏目解析器
 	 * @return
 	 */
@@ -104,12 +105,10 @@ public class SearchSqlHelper {
 			if(aliasList == null){
 				aliasList = aliasMap.get("@"+c.getName());
 			}
-			if(aliasList == null){
-				columnMap.put(c.getName(), ColumnObtainer.build(c).newInstance());
-			}else{
-				for(String alias :aliasList){
-					if(alias == DEFAULT_ALIAS){
-						columnMap.put(c.getName(), ColumnObtainer.build(c).newInstance());
+			if(aliasList != null){
+					for(String alias :aliasList){
+					if(alias == DEFAULT_ALIAS){//只能一个表不设别名
+						columnMap.put(DEFAULT_ALIAS, ColumnObtainer.build(c).newInstance());
 					}else{
 						columnMap.put(alias, ColumnObtainer.build(c).alias(alias).newInstance());
 					}
@@ -123,6 +122,32 @@ public class SearchSqlHelper {
 		
 	}
 	
+	
+	/**
+	 * 解析sql变量名，可直接不需要完整的sql
+	 * 
+	 * @param sql 要解析的sql
+	 * @param clsess 栏目解析器
+	 * @return
+	 */
+	
+	public static String parseHalfSql(String sql,ColumnObtainer... clsses){
+		if(StringUtils.isBlank(sql) || (!sql.contains(COLUMN_PRFIX)
+				&& !sql.contains(TABLE_PRFIX))){
+			return sql;
+		}
+		
+		Map<String,ColumnObtainer> columnMap = new HashMap<String,ColumnObtainer>();
+		for(ColumnObtainer c : clsses){
+			String alias = c.getAlias();
+			columnMap.put(StringUtils.isBlank(alias)?DEFAULT_ALIAS:alias, c);
+		}
+		
+		String sb = parseColumn(sql,columnMap);
+		
+		return parseTableName(sb,columnMap.values().toArray(new ColumnObtainer[columnMap.size()]));
+		
+	}
 	
 	static String parseColumn(String sql,Map<String,ColumnObtainer> columnMap){
 		StringBuffer sb = new StringBuffer();
@@ -164,7 +189,7 @@ public class SearchSqlHelper {
 	}
 	
 	static void setAlias(String group,Map<String,List<String>> map){
-		String[] names = group.split("\\s");
+		String[] names = group.split("\\s+");
 		String alias = null;
 		String classname = names[0];
 		List<String> aliasList = map.get(classname);
@@ -199,7 +224,7 @@ public class SearchSqlHelper {
 		
 		String name = names.length > 1 ? names[1] : names[0];
 		
-		ColumnObtainer c = columnObtainers.get(prefix);
+		ColumnObtainer c = columnObtainers.get(StringUtils.isBlank(prefix)?DEFAULT_ALIAS:prefix);
 		
 		String columnName = null;
 		
@@ -208,15 +233,16 @@ public class SearchSqlHelper {
 		}
 		
 		if(c != null)
-			return c.getColumn(name);
+			columnName = c.getColumn(name);
 		
-		for(String key : columnObtainers.keySet()){
+/*  遍历查询，如存在同名字段将导致未知错误
+ * 		for(String key : columnObtainers.keySet()){
 			c = columnObtainers.get(key);
 			columnName = c.getColumn(name);
 			if(columnName != null){
 				break;
 			}
-		}
+		}*/
 		
 		if(columnName == null){
 			throw new IllegalStateException("Doesn't have a column[ "+ name +" ] in the tables.");

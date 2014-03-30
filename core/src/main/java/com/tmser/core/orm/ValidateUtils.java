@@ -1,6 +1,5 @@
 package com.tmser.core.orm;
 
-import com.tmser.core.exception.ParamIllegalityException;
 /**
  * 字段验证
  * @author tjx
@@ -16,7 +15,7 @@ public final class ValidateUtils {
 	 * @param value
 	 *            字段值
 	 */
-	public static void checkColumnValue(Column column, Object value) throws ParamIllegalityException{
+	public static void checkColumnValue(Column column, Object value) throws IllegalArgumentException{
 		checkColumnNull(column, value);
 		checkColumnLength(column, value);
 	}
@@ -33,7 +32,7 @@ public final class ValidateUtils {
 		if (value == null) {
 			// 非空属性判断
 			if (!column.isNullable()) {
-				throw new ParamIllegalityException(column.getColumn() + "不能为空！");
+				throw new IllegalArgumentException(column.getColumn() + "不能为空！");
 			}
 		}
 	}
@@ -52,7 +51,7 @@ public final class ValidateUtils {
 				String valueStr = value.toString();
 				int limitLength = column.getLength();
 				if (limitLength > 0 && valueStr.length() > limitLength) {
-					throw new ParamIllegalityException(column.getColumn()
+					throw new IllegalArgumentException(column.getColumn()
 							+ "超过长度限制！");
 				}
 			}
