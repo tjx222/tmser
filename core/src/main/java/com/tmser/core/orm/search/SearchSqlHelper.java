@@ -28,6 +28,8 @@ public class SearchSqlHelper {
 	
 	public static final String TABLE_PRFIX = "@";
 	
+	public static final String LIKE_PRFIX = "__#%";
+	
 	static final String DEFAULT_ALIAS = "__default";
 	
 	static final String AS = "as";

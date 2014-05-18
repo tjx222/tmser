@@ -28,8 +28,13 @@ public abstract class QueryObject implements Serializable,PageAble,OrderAble{
 	 * 自定义排序
 	 */
 	@Transient 
-	private String tmserOrder;
+	private String order;
 	
+	/**
+	 * 自定义分组
+	 */
+	@Transient 
+	private String group;
 	
 	/**
 	 * 自定义查询字段
@@ -70,14 +75,14 @@ public abstract class QueryObject implements Serializable,PageAble,OrderAble{
 	 * 自定义排序
 	 */
 	public String order() {
-		return tmserOrder;
+		return order;
 	}
 
 	/**
 	 * 自定义排序
 	 */
 	public void addOrder(String order) {
-		this.tmserOrder = order;
+		this.order = order;
 	}
 	
 	public String toString() {

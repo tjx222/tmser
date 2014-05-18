@@ -1,5 +1,6 @@
 package com.tmser.core.orm;
 
+import org.springframework.jdbc.core.StatementCreatorUtils;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 
 
@@ -27,21 +28,38 @@ public class ValidateAbleSqlParameterSource extends BeanPropertySqlParameterSour
 		return this;
 	}
 	
-  /**
-   * {@inheritDoc}
-   */	
+	  /**
+	   * {@inheritDoc}
+	   */	
+	@Override
+	public boolean hasValue(String paramName){
+		return table.getColumn(paramName) != null;
+	}
+	 /**
+	   * {@inheritDoc}
+	   */	
+	@Override
+	public int getSqlType(String paramName){
+		return StatementCreatorUtils.javaTypeToSqlParameterType((Class<?>)table.getColumn(paramName).getAttrType());
+	}
+	
+/**
+ * {@inheritDoc}
+ */	
 	@Override
 	public Object getValue(String paramName) throws IllegalArgumentException {
 		if(table == null){
 			throw new NullPointerException("table must be set befor this method invoke!" );
 		}
-		Object value = super.getValue(paramName);
-		Column column = table.getColumnByAttrName(paramName);
+		Column column = table.getColumn(paramName);
+		Object value = null;
 		if(column != null){
-				ValidateUtils.checkColumnValue(column,value);
-					//throw new IllegalArgumentException("this table mapper bo doesn't has the parameter :"+paramName );
+			value = super.getValue(column.getName());
+			ValidateUtils.checkColumnValue(column,value);
+		}else{
+			throw new IllegalArgumentException("this table mapper bo doesn't has the parameter :"+paramName );
 		}
-				
+		
 		return value;
 	}
 }

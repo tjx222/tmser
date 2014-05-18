@@ -221,7 +221,7 @@ public abstract class AbstractDAO<E extends QueryObject, K extends Serializable>
 
 		Map<String, Object> paramMap = new HashMap<String, Object>();
 		
-		String qs = compileUpdateParams(table,model,paramMap,true);
+		String qs = compileUpdateParams(table,model,paramMap,false);
 		if(qs == null){
 			log.info("model :" +model +"  no need to update");
 			return;
@@ -251,7 +251,7 @@ public abstract class AbstractDAO<E extends QueryObject, K extends Serializable>
 
 		Map<String, Object> paramMap = new HashMap<String, Object>();
 		
-		String qs = compileUpdateParams(table,model,paramMap,false);
+		String qs = compileUpdateParams(table,model,paramMap,true);
 		if(qs == null){
 			log.info("model :" +model +"  no need to update");
 			return;
@@ -286,8 +286,11 @@ public abstract class AbstractDAO<E extends QueryObject, K extends Serializable>
 		
 		sqlStr.append(compileQureyParams(columns,model,paramMap));
 		
-		if(page.needTotal())
+		if(page.needTotal()){
 			 page.setTotalCount(getTotalCountByNamedParams(sqlStr.toString(),paramMap));
+		}else if(page.getPageSize() == Integer.MAX_VALUE){
+			page.setPageSize(page.getPageSize() -1);
+		 }
 		
 		//排序
 		String order = model.order();
@@ -723,9 +726,12 @@ public abstract class AbstractDAO<E extends QueryObject, K extends Serializable>
 	 */
 	protected <T> PageList<T> queryPage(String sql, Object[] args, TmserMapper<T> TmserMapper,final Page pageInfo) throws DataAccessException {
 		assertNotNull(sql,"query sql");
-		String wrapperSql = PageUtil.gernatePageSql(sql,pageInfo);
-		if(pageInfo.needTotal())
+		if(pageInfo.needTotal()) {
 			 pageInfo.setTotalCount(getTotalCount(sql,args));
+		   }else if(pageInfo.getPageSize() == Integer.MAX_VALUE){
+		            pageInfo.setPageSize(pageInfo.getPageSize() -1);
+		   }
+		String wrapperSql = PageUtil.gernatePageSql(sql,pageInfo);
 		return new PageList<T>(query(wrapperSql, args, TmserMapper),pageInfo);
 	}
 	
@@ -742,9 +748,12 @@ public abstract class AbstractDAO<E extends QueryObject, K extends Serializable>
 	 */
 	protected PageList<Map<String,Object>> queryPage(String sql, Object[] args,final Page pageInfo) throws DataAccessException {
 		assertNotNull(sql,"query sql");
-		String wrapperSql = PageUtil.gernatePageSql(sql,pageInfo);
-		if(pageInfo.needTotal())
+		if(pageInfo.needTotal()) {
 			 pageInfo.setTotalCount(getTotalCount(sql,args));
+		   }else if(pageInfo.getPageSize() == Integer.MAX_VALUE){
+		            pageInfo.setPageSize(pageInfo.getPageSize() -1);
+		   }
+		String wrapperSql = PageUtil.gernatePageSql(sql,pageInfo);
 		return new PageList<Map<String,Object>>(query(wrapperSql, args),pageInfo);
 	}
 	
@@ -760,13 +769,15 @@ public abstract class AbstractDAO<E extends QueryObject, K extends Serializable>
 	 */
 	protected <T> PageList<T> queryPageByNamedSql(String sql,Map<String,Object> args, TmserMapper<T> TmserMapper,Page pageInfo) throws DataAccessException {
 		assertNotNull(sql,"query sql");
+		if(pageInfo.needTotal()) {
+            pageInfo.setTotalCount(getTotalCountByNamedParams(sql,args));
+		   }else if(pageInfo.getPageSize() == Integer.MAX_VALUE){
+		            pageInfo.setPageSize(pageInfo.getPageSize() -1);
+		   }
 		String wrapperSql = PageUtil.gernatePageSql(sql, pageInfo);
 		if(log.isDebugEnabled()) {
 			log.debug("sql:" + wrapperSql+","+ argsToString(args));
 		}
-		 if(pageInfo.needTotal()) {
-			 pageInfo.setTotalCount(getTotalCountByNamedParams(sql,args));
-		 }
 		return new PageList<T>(getNamedParameterJdbcTemplate().query(wrapperSql, args, TmserMapper),pageInfo);
 	}
 	
@@ -783,13 +794,15 @@ public abstract class AbstractDAO<E extends QueryObject, K extends Serializable>
 	 */
 	protected PageList<Map<String,Object>> queryPageByNamedSql(String sql,Map<String,Object> args, Page pageInfo) throws DataAccessException {
 		assertNotNull(sql,"query sql");
+		if(pageInfo.needTotal()) {
+            pageInfo.setTotalCount(getTotalCountByNamedParams(sql,args));
+		   }else if(pageInfo.getPageSize() == Integer.MAX_VALUE){
+		            pageInfo.setPageSize(pageInfo.getPageSize() -1);
+		   }
 		String wrapperSql = PageUtil.gernatePageSql(sql, pageInfo);
 		if(log.isDebugEnabled()) {
 			log.debug("sql:" + wrapperSql+","+ argsToString(args));
 		}
-		 if(pageInfo.needTotal()) {
-			 pageInfo.setTotalCount(getTotalCountByNamedParams(sql,args));
-		 }
 		return new PageList<Map<String,Object>>(queryByNamedSql(wrapperSql, args),pageInfo);
 	}
 	
@@ -896,8 +909,17 @@ public abstract class AbstractDAO<E extends QueryObject, K extends Serializable>
 			if(value != null){
 				if(!String.class.equals(column.getAttrType())
 						|| StringUtils.isNotBlank(String.valueOf(value))) {
+				    String op = " = :";
+				    if(String.class.equals(column.getAttrType())){
+				        String v = ((String)value).trim();
+				        if(v.startsWith(SearchSqlHelper.LIKE_PRFIX) || v.endsWith(SearchSqlHelper.LIKE_PRFIX)){
+				            op = " like :";
+				            value = v.replace(SearchSqlHelper.LIKE_PRFIX, "%");
+				        }
+				    }
+				    
 					queryParams.append(" and ").append(column.getColumn())
-					.append(" = :").append(column.getName());
+					.append(op).append(column.getName());
 					paramMap.put(column.getName(), value);
 				}
 				
@@ -944,7 +966,7 @@ public abstract class AbstractDAO<E extends QueryObject, K extends Serializable>
 			if(column.isPK())
 				continue;
 			Object value = Reflections.getFieldValue(model, column.getName());
-			if(filterNull && value != null){
+			if(filterNull || value != null){
 				if(queryParams.length() > 0)
 					queryParams.append(", ");
 				queryParams.append(column.getColumn())
