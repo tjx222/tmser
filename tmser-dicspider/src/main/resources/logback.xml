@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration debug="true">
+	<!-- logger config begin -->
+	<property name="log.log4jdbc.enable" value="true"/> <!--是否开启数据库日志 -->
+	<property name="log.base" value="e:/logs/dic/"/> <!--文件日志存储基础路径 -->
+	<property name="log.pattern.default" value="%d{HH:mm:ss} [%thread] %-5level %logger - %msg%n"/> <!-- 默认日期输出格式 -->
+	<property name="log.maxsize" value="20MB"/> <!--日志文件最大的大小-->  
+
+	<contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator"/>
+	
+    <!-- 控制台 -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${log.pattern.default}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+    
+    <!-- 出错日志 appender  -->
+    <appender name="ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 按天回滚 daily -->
+            <!-- log.base 在maven profile里配置 -->
+            <fileNamePattern>${log.base}/jy-error-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- 日志最大的历史 60天 -->
+            <maxHistory>60</maxHistory>
+        </rollingPolicy>
+         
+       <!--日志文件最大的大小-->  
+       <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">  
+         <MaxFileSize>${log.maxsize}</MaxFileSize>  
+       </triggeringPolicy>
+       
+        <encoder>
+            <pattern>${log.pattern.default}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+         <filter class="ch.qos.logback.classic.filter.LevelFilter"><!-- 只打印错误日志 -->  
+            <level>ERROR</level>  
+            <onMatch>ACCEPT</onMatch>  
+            <onMismatch>DENY</onMismatch>  
+        </filter>  
+    </appender>
+    
+    <root level="info">
+     	<appender-ref ref="STDOUT"/>
+     	<appender-ref ref="ERROR"/> 
+    </root>
+    
+    <logger name="org.springframework" level="ERROR">
+    </logger>
+    
+    <logger name="com.tmser" level="DEBUG">
+    </logger>
+    
+	<if condition='${log.log4jdbc.enable}'>
+	<then>
+		<logger name="druid.sql.DataSource" level="ERROR"/>
+		<logger name="druid.sql.Connection" level="ERROR"/>
+		<logger name="druid.sql.Statement" level="ON"/>
+		<logger name="druid.sql.ResultSet" level="ERROR"/>
+	</then>
+	</if>
+  
+</configuration>
+
+
+
+

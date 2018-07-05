@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:cache="http://www.springframework.org/schema/cache"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+		http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-3.2.xsd"
+	default-lazy-init="true">
+
+   <description>Spring Cache Configuration</description>
+   
+   <cache:annotation-driven cache-manager="cacheManger"/>
+   
+   <bean id="cacheManger" class="com.tmser.common.cache.ehcache.CompositeEhCacheManager">
+    <property name="cacheManagers">
+        <list>
+               <bean class="com.tmser.common.cache.ehcache.EhCacheManager">  
+		    	<property name="cacheManager">
+		    	    <!--entity ehcache-->
+				    <bean class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+				        <property name="configLocation" value="classpath:config/cache/ehcache-entity.xml"/>
+				    </bean>
+		    	</property>
+		   		<property name="transactionAware" value="true"/>  
+		    </bean> 
+		    
+            <bean class="com.tmser.common.cache.ehcache.EhCacheManager">  
+		    	<property name="cacheManager">
+		    	    <!--ehcache-->
+				    <bean class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+				        <property name="configLocation" value="classpath:config/cache/ehcache-jy.xml"/>
+				    </bean>
+		    	</property>
+		   		<property name="transactionAware" value="false"/>  
+		    </bean> 
+        </list>
+    </property>
+    <property name="fallbackToNoOpCache" value="false"/>
+   </bean>
+   
+
+	<!-- 开启AOP监听 只对当前配置文件有效 -->
+    <aop:aspectj-autoproxy expose-proxy="true" proxy-target-class="true"/>
+    
+	<bean id="baseDaoAdvisor" class="com.tmser.common.dao.aop.BaseDaoCacheAdvisor"></bean>  
+	<!-- execution(* com.tmser..dao.impl.*(..)) and @within(com.tmser.common.dao.annotation.UseCache) -->  
+    <aop:config expose-proxy="true">  
+	 <aop:pointcut id="baseDaoPointcut" expression="within(com.tmser.common.dao.BaseDAO+) and @target(com.tmser.common.dao.annotation.UseCache)
+	  and (execution( * get(..)) or execution( * update(..)) or execution( * insert(..)) or execution( * delete(..)))"/>  
+	 
+	 <aop:aspect ref="baseDaoAdvisor">  
+	    <aop:around pointcut-ref="baseDaoPointcut" method="findFromCache"/>
+	 </aop:aspect>
+	</aop:config> 
+  
+</beans>
+	
