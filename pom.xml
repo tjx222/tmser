@@ -27,7 +27,7 @@
 		<jdbc.driver.groupId>mysql</jdbc.driver.groupId>
 		<jdbc.driver.artifactId>mysql-connector-java</jdbc.driver.artifactId>
 		<jdbc.driver.version>5.1.36</jdbc.driver.version>
-		<fastjson.version>1.1.46</fastjson.version>
+		<fastjson.version>1.2.24</fastjson.version>
 		<jcaptcha.version>2.0-alpha-1</jcaptcha.version>
 		<ehcache.core.version>2.6.6</ehcache.core.version>
 		<freemarker.version>2.3.19</freemarker.version>
@@ -35,9 +35,10 @@
 		<druid.version>1.0.14</druid.version>
 		<poi.version>3.12</poi.version>
 		<pinyin4j.version>2.5.0</pinyin4j.version>
-		<httpclient.version>4.5.1</httpclient.version>
+		<httpclient.version>4.5.2</httpclient.version>
 		<echarts.version>2.2.6</echarts.version>
 		<jsqlparser.version>1.0.1</jsqlparser.version>
+		<codecraft.version>0.6.3</codecraft.version>
 	</properties>
 			<!-- 设定除中央仓库(repo1.maven.org/maven2/)外的其他仓库,按设定顺序进行查找. -->
 	<repositories>
@@ -76,6 +77,17 @@
 			<groupId>com.tmser</groupId>
 			<artifactId>jsqlparser</artifactId>
 			<version>${jsqlparser.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>us.codecraft</groupId>
+			<artifactId>webmagic-core</artifactId>
+			<version>${codecraft.version}</version>
+			<exclusions>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+             </exclusions>
 		</dependency>
 	
 	<!-- jdbc driver -->
@@ -472,5 +484,6 @@
 	<modules>
 		<module>./tmser-utils</module>
 		<module>./tmser-orm</module>
+		<module>./tmser-dicspider</module>
 	</modules>
 </project>

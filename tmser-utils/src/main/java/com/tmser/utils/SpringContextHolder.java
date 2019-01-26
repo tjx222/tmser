@@ -154,17 +154,4 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
 		 
 		 return rs;
 	}
-	
-	
-	/**
-	 * <p>
-	 *  名称有歧义，使用@see SpringContextHolder.getBeansForType
-	 * @param requiredType
-	 * @return
-	 */
-	@Deprecated
-	public static <T> List<T> getBeanNamesForType(Class<T> requiredType){
-		return getBeansForType(requiredType);
-	}
-	
 }

@@ -37,5 +37,10 @@
 			<groupId>com.tmser</groupId>
 			<artifactId>jsqlparser</artifactId>
 		</dependency>
+		
+		<dependency>
+			<groupId>${jdbc.driver.groupId}</groupId>
+			<artifactId>${jdbc.driver.artifactId}</artifactId>
+		</dependency>
 	</dependencies>
 </project>
