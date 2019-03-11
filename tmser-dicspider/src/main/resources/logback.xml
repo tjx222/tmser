@@ -36,7 +36,7 @@
             <charset>UTF-8</charset>
         </encoder>
          <filter class="ch.qos.logback.classic.filter.LevelFilter"><!-- 只打印错误日志 -->  
-            <level>ERROR</level>  
+            <level>WARN</level>  
             <onMatch>ACCEPT</onMatch>  
             <onMismatch>DENY</onMismatch>  
         </filter>  
@@ -44,11 +44,15 @@
     
     <root level="info">
      	<appender-ref ref="STDOUT"/>
-     	<appender-ref ref="ERROR"/> 
     </root>
     
     <logger name="org.springframework" level="ERROR">
     </logger>
+    
+    <logger name="us.codecraft.webmagic.downloader.HttpClientDownloader" level="WARN" additivity="false">
+     <appender-ref ref="ERROR"/> 
+    </logger>
+    
     
     <logger name="com.tmser" level="DEBUG">
     </logger>
