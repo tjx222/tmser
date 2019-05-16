@@ -49,7 +49,7 @@ public class QuestionImgSpider {
           fold = "ggb";
         }
 
-        File f = new File("E://qres/new//" + fold + "//" + fileName);
+        File f = new File("E://qres/new1//" + fold + "//" + fileName);
 
         if (!f.exists()) {
           byte[] content = page.getRawContent();
@@ -89,7 +89,7 @@ public class QuestionImgSpider {
   }
 
   private static Map<String, String> parseUrl() {
-    File imgFile = new File("E://qres/miss.log");
+    File imgFile = new File("E://qres/question-miss-meta-log-2019-03-14.log");
     Map<String, String> urlSet = new HashMap<>(200000);
     try {
       for (String url : FileUtils.readLines(imgFile)) {
@@ -99,7 +99,7 @@ public class QuestionImgSpider {
         if (fileName.endsWith(".mp3") || fileName.endsWith(".m4a")) {
           fold = "media";
         } else if (fileName.endsWith(".ggb")) {
-          fold = "ggb";
+          fold = "new//ggb";
         }
 
         File f = new File("E://qres/new//" + fold + "//" + fileName);
