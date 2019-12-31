@@ -36,7 +36,7 @@ public class QuestionImgLxReplace {
 
   private static XkItemDao xkitemDao;
 
-  private static String talCdnHost = "http://cdn.talcloud.com/cdn/oldques/lximg/";
+  private static String talCdnHost = "http://cdn.test.com/cdn/oldques/lximg/";
   static int count = 0;
 
   public static String int2chineseNum(int src) {
