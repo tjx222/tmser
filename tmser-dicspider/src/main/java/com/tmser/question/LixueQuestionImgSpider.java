@@ -28,11 +28,11 @@ import us.codecraft.webmagic.processor.PageProcessor;
  * @author tmser
  * @version $Id: QuestionImgSpider.java, v 1.0 2019年3月7日 下午7:05:51 tmser Exp $
  */
-public class QuestionImgSpider {
+public class LixueQuestionImgSpider {
 
-  private final static Logger logger = LoggerFactory.getLogger(QuestionImgSpider.class);
+  private final static Logger logger = LoggerFactory.getLogger(LixueQuestionImgSpider.class);
 
-  static class QuestionImgProcessor implements PageProcessor {
+  static class LixueQuestionImgProcessor implements PageProcessor {
     private Site site = Site.me().setCharset("GBK").setRetryTimes(3).setTimeOut(30000).setSleepTime(100);
 
     @Override
@@ -46,7 +46,7 @@ public class QuestionImgSpider {
           fold = "ggb";
         }
 
-        File f = new File("E://qres/new1//" + fold + "//" + fileName);
+        File f = new File("E://qres//xuekeres//" + fold + "//" + fileName);
 
         if (!f.exists()) {
           byte[] content = page.getRawContent();
@@ -73,7 +73,7 @@ public class QuestionImgSpider {
   public static void main(String[] args) {
     ApplicationContext ctx = new ClassPathXmlApplicationContext("classpath*:/config/spring/*.xml");
     Map<String, String> urls = parseUrl();
-    Spider sp = Spider.create(new QuestionImgProcessor());
+    Spider sp = Spider.create(new LixueQuestionImgProcessor());
     for (Entry<String, String> urlEntry : urls.entrySet()) {
 
       Request rq = new Request(urlEntry.getKey());
@@ -99,7 +99,7 @@ public class QuestionImgSpider {
           fold = "new//ggb";
         }
 
-        File f = new File("E://qres/new//" + fold + "//" + fileName);
+        File f = new File("E://lixue//" + fold + "//" + fileName);
         if (!f.exists()) {
           urlSet.put(url, fileName);
         }

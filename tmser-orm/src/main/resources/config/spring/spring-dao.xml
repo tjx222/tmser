@@ -79,7 +79,7 @@
 	
 	<!--orm bo 映射扫描  -->
 	<bean class="com.tmser.common.orm.MapperScannerConfig">
-		<property name="basePackage" value="com/tmser/**/bo" />
+		<property name="basePackage" value="com/tmser/**" />
 	</bean>
 	
 	<bean id="msgThreadPool"  

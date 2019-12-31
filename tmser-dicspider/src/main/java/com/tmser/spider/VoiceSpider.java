@@ -1,6 +1,3 @@
-/**
- * Mainbo.com Inc. Copyright (c) 2015-2017 All Rights Reserved.
- */
 
 package com.tmser.spider;
 
