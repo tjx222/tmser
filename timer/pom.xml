@@ -14,7 +14,7 @@
 <url>http://www.tmser.com/timer</url>
 
 <properties>
-	<quartz.version>2.2.1</quartz.version>
+	<quartz.version>2.3.2</quartz.version>
 	<spring.version>3.2.6.RELEASE</spring.version>
 	<cglib.version>2.2.2</cglib.version>
 </properties>
