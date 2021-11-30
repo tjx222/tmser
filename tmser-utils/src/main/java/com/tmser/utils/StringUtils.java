@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  * @author tjx
  * @version 2013-12-30
  */
-public class StringUtils extends org.apache.commons.lang3.StringUtils {
+public class StringUtils extends StringU {
 	
 	public static final String COMMA= ",";
 

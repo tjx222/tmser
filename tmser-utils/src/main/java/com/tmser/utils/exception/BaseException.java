@@ -66,7 +66,7 @@ public class BaseException extends RuntimeException{
     public String getMessage() {
         String message = null;
         if (!StringUtils.isEmpty(code)) {
-            message = MessageUtils.message(code,defaultMessage, args);
+            message = MessageUtils.message(code, defaultMessage, args);
         }
         return message;
     }

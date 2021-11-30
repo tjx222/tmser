@@ -63,7 +63,7 @@ public class ZipUtils {
 	 * 
 	 * @param srcFile
 	 *            源路径
-	 * @param destPath
+	 * @param destFile
 	 *            目标路径
 	 * @throws Exception
 	 */
@@ -85,7 +85,7 @@ public class ZipUtils {
 	 * 
 	 * @param srcFiles
 	 *            源文件列表
-	 * @param destPath
+	 * @param destFile
 	 *            目标路径
 	 * @throws Exception
 	 */
@@ -109,7 +109,7 @@ public class ZipUtils {
 	 * 
 	 * @param srcFiles
 	 *            源文件列表
-	 * @param destPath
+	 * @param destFile
 	 *            目标路径
 	 * @throws Exception
 	 */
