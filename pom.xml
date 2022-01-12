@@ -19,6 +19,10 @@
 		<fastjson.version>1.2.24</fastjson.version>
         <druid.version>1.2.5</druid.version>
         <guava.version>31.0.1-jre</guava.version>
+        <commons-io.version>2.11.0</commons-io.version>
+        <logstash.version>7.0.1</logstash.version>
+        <mybatis-plus-boot-starter.version>3.4.3</mybatis-plus-boot-starter.version>
+        <dynamic-datasource-spring-boot-starter.version>3.5.0</dynamic-datasource-spring-boot-starter.version>
 	</properties>
 	<!-- 设定除中央仓库(repo1.maven.org/maven2/)外的其他仓库,按设定顺序进行查找. -->
 	<repositories>
@@ -49,11 +53,25 @@
 				<artifactId>fastjson</artifactId>
 				<version>${fastjson.version}</version>
 			</dependency>
-			<dependency>
+
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
+            </dependency>
+
+            <dependency>
 				<groupId>com.alibaba</groupId>
 				<artifactId>druid</artifactId>
 				<version>${druid.version}</version>
 			</dependency>
+
+
+            <dependency>
+                <groupId>net.logstash.logback</groupId>
+                <artifactId>logstash-logback-encoder</artifactId>
+                <version>${logstash.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>com.google.guava</groupId>
@@ -67,6 +85,17 @@
 				<version>${junit.version}</version>
 				<scope>test</scope>
 			</dependency>
+
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <version>${mybatis-plus-boot-starter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
+                <version>${dynamic-datasource-spring-boot-starter.version}</version>
+            </dependency>
         </dependencies>
 	</dependencyManagement>
 
@@ -91,11 +120,31 @@
             <artifactId>logback-classic</artifactId>
         </dependency>
         <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-access</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.codehaus.janino</groupId>
             <artifactId>janino</artifactId>
         </dependency>
 
-		<!-- TEST begin -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- TEST begin -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -115,6 +164,7 @@
 	</scm>
 
     <modules>
-        <module>./tmser-utils</module>
+        <module>./tmser-common</module>
+        <module>./tmser-sample</module>
     </modules>
 </project>
