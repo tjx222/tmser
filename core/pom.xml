@@ -27,7 +27,7 @@
 		<freemarker.version>2.3.19</freemarker.version>
 		<cglib.version>2.2.2</cglib.version>
 		<ehcache.version>2.6.6</ehcache.version>
-		<struts2.version>2.3.16</struts2.version>
+		<struts2.version>2.5.30</struts2.version>
 		<!-- other setting -->
 		<cas.version>3.2.1</cas.version>
 		<aspectj.version>1.7.0</aspectj.version>
