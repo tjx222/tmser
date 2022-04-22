@@ -15,7 +15,7 @@
 
 <properties>
 	<quartz.version>2.2.1</quartz.version>
-	<spring.version>3.2.6.RELEASE</spring.version>
+	<spring.version>5.3.19</spring.version>
 	<cglib.version>2.2.2</cglib.version>
 </properties>
 
