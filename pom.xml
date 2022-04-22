@@ -11,7 +11,7 @@
 		<commons-fileupload.version>1.3.1</commons-fileupload.version>
 		<commons-lang3.version>3.1</commons-lang3.version>
 		<commons-math3.version>3.5</commons-math3.version>
-		<spring.version>3.2.18.RELEASE</spring.version>
+		<spring.version>5.3.19</spring.version>
 		<aspectjweaver.version>1.8.3</aspectjweaver.version>
 		<slf4j.version>1.7.10</slf4j.version>
 		<logback.version>1.1.2</logback.version>
@@ -40,7 +40,7 @@
 		<jsqlparser.version>1.0.1</jsqlparser.version>
 		<codecraft.version>0.6.3</codecraft.version>
 	</properties>
-			<!-- Éè¶¨³ýÖÐÑë²Ö¿â(repo1.maven.org/maven2/)ÍâµÄÆäËû²Ö¿â,°´Éè¶¨Ë³Ðò½øÐÐ²éÕÒ. -->
+			<!-- è®¾å®šé™¤ä¸­å¤®ä»“åº“(repo1.maven.org/maven2/)å¤–çš„å…¶ä»–ä»“åº“,æŒ‰è®¾å®šé¡ºåºè¿›è¡ŒæŸ¥æ‰¾. -->
 	<repositories>
 		<repository>
 			<id>central-repos</id>
@@ -232,14 +232,14 @@
 			<version>${slf4j.version}</version>
 		</dependency>
 	
-		<!-- common-logging Êµ¼Êµ÷ÓÃslf4j -->
+		<!-- common-logging å®žé™…è°ƒç”¨slf4j -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>jcl-over-slf4j</artifactId>
 			<version>${slf4j.version}</version>
 			<scope>runtime</scope>
 		</dependency>
-		<!-- java.util.logging Êµ¼Êµ÷ÓÃslf4j -->
+		<!-- java.util.logging å®žé™…è°ƒç”¨slf4j -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>jul-to-slf4j</artifactId>
@@ -255,7 +255,7 @@
 			<scope>runtime</scope>
 		</dependency>
 		
-		<!-- ÈÕÖ¾Ïà¹Øjar°ü -->
+		<!-- æ—¥å¿—ç›¸å…³jaråŒ… -->
          <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
@@ -267,7 +267,7 @@
 			<version>${janino.version}</version>
 		</dependency>
 
-		<!-- encache Ïà¹Øjar°ü -->
+		<!-- encache ç›¸å…³jaråŒ… -->
         <dependency>
             <groupId>net.sf.ehcache</groupId>
             <artifactId>ehcache-core</artifactId>
@@ -398,13 +398,13 @@
 		</pluginManagement>
 	
 		<plugins>
-			<!-- Compiler ²å¼þ, Éè¶¨JDK°æ±¾ -->
+			<!-- Compiler æ’ä»¶, è®¾å®šJDKç‰ˆæœ¬ -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 			</plugin>
 			
-			<!--Ô´´úÂë²å¼þ-->
+			<!--æºä»£ç æ’ä»¶-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
@@ -421,7 +421,7 @@
 				</executions>
 			</plugin>
 
-			<!-- Eclipse ²å¼þ -->
+			<!-- Eclipse æ’ä»¶ -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-eclipse-plugin</artifactId>
@@ -430,7 +430,7 @@
 					<downloadSources>false</downloadSources>
 					<downloadJavadocs>false</downloadJavadocs>
 					<wtpversion>2.0</wtpversion>
-					<!-- Ôö¼ÓÉèÖÃÏîÄ¿encodingµÄÎÄ¼þ -->
+					<!-- å¢žåŠ è®¾ç½®é¡¹ç›®encodingçš„æ–‡ä»¶ -->
 					<additionalConfig>
 						<file>
 							<name>.settings/org.eclipse.core.resources.prefs</name>
