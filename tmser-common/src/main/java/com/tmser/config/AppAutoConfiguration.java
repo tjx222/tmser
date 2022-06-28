@@ -12,14 +12,15 @@ import org.springframework.context.annotation.Configuration;
 public class AppAutoConfiguration {
 
     @Bean
-    public ObjectMapper objectMapper(){
+    public ObjectMapper objectMapper() {
         return JsonUtil.getDefaultMapper();
     }
 
 
     @Bean
-    public SpringApplicationContext springApplicationContext(){
+    public SpringApplicationContext springApplicationContext() {
         return new SpringApplicationContext();
     }
+
 
 }

@@ -4,6 +4,16 @@ server:
   servlet:
       context-path: /sample
 
+nacos:
+  config:
+    enabled: true
+    serverAddr: localhost:8848
+    dataId: sample
+    type: yaml
+    autoRefresh: true
+    bootstrap:
+      logEnable: true
+
 management:
     endpoints:
       web:
@@ -38,4 +48,4 @@ spring:
           username: root
           password: 123456
 
-config.sensitive.aes_key: qwertyuioplkjhgf
+sensitive.aes_key: qwertyuioplkjhgf

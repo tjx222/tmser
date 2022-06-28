@@ -39,7 +39,7 @@ public class BaseException extends RuntimeException {
 
     public BaseException(String module, IError error, Object[] args, String errorMessage) {
         this.module = module;
-        this.error = error == null ? CommonError.UNKNOWN : error;
+        this.error = error == null ? CommonError.FAILED : error;
         this.args = args;
         this.errorMessage = errorMessage;
         if (errorMessage == null) {
@@ -77,8 +77,8 @@ public class BaseException extends RuntimeException {
         return module;
     }
 
-    public Integer getErrorCode() {
-        return error != null ? error.getCode() : CommonError.UNKNOWN.getCode();
+    public String getErrorCode() {
+        return error != null ? error.getCode() : CommonError.FAILED.getCode();
     }
 
     public IError getError() {

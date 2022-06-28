@@ -9,10 +9,7 @@ package com.tmser.enums;
  */
 public  enum EConfigNamespace {
     // 配置中心 name space
-    CONFIG("config", "公共配置父类"),
     CONFIG_ASEKEY("sensitive.aes_key", "aes加密秘钥");
-
-    public static final String NEED_SEND_RECOVER_MESSAGE = "need_send_recver_msg";
 
     private final String message;
 

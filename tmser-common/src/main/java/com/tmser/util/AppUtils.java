@@ -9,7 +9,7 @@ public abstract class AppUtils {
 
     public static final String appName;
     public static final String appParentName;
-    public static  final String runEvn;
+    public static final String runEvn;
     public static final String author;
     public static final String department;
     private static final String authorMobile;
@@ -61,7 +61,7 @@ public abstract class AppUtils {
     }
 
     public static boolean getBoolean(String str, boolean def) {
-        if(str == null || str.trim().length() == 0) {
+        if (str == null || str.trim().length() == 0) {
             return def;
         } else {
             str = str.trim().toUpperCase();
@@ -70,7 +70,7 @@ public abstract class AppUtils {
     }
 
     public static int getInt(String str, int def) {
-        if(str == null) {
+        if (str == null) {
             return def;
         } else {
             try {
@@ -83,9 +83,9 @@ public abstract class AppUtils {
 
     public static boolean isBlank(CharSequence cs) {
         int strLen;
-        if(cs != null && (strLen = cs.length()) != 0) {
-            for(int i = 0; i < strLen; ++i) {
-                if(!Character.isWhitespace(cs.charAt(i))) {
+        if (cs != null && (strLen = cs.length()) != 0) {
+            for (int i = 0; i < strLen; ++i) {
+                if (!Character.isWhitespace(cs.charAt(i))) {
                     return false;
                 }
             }
@@ -98,14 +98,12 @@ public abstract class AppUtils {
 
     static {
         try {
-
             localHostAddress = IpUtils.getLocalAddress().getHostAddress();
         } catch (NullPointerException var2) {
             localHostAddress = "";
         }
 
         try {
-
             localHostName = IpUtils.getLocalAddress().getHostName();
         } catch (NullPointerException var1) {
             localHostName = "";

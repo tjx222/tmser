@@ -16,11 +16,10 @@ public class ServiceFinder<T> {
     private final Supplier<T> supplier;
 
     private ServiceFinder(final Class<T> clz) {
-        this.supplier = Suppliers.memoize(new Supplier() {
-            public T get() {
-                ServiceLoader loader = ServiceLoader.load(clz);
-                return (T) Iterables.getFirst(loader, (T) null);
-            }
+        this.supplier = Suppliers.memoize(() ->
+        {
+            ServiceLoader<T> loader = ServiceLoader.load(clz);
+            return (T) Iterables.getFirst(loader, null);
         });
     }
 
@@ -43,7 +42,7 @@ public class ServiceFinder<T> {
     }
 
     static {
-        errorMessages.put(ServerManagement.class, "请检查是否引用了common-core，并且common各个包版本必须一致");
+        errorMessages.put(ServerManagement.class, "请检查是否引用了common，并且common各个包版本必须一致");
         instanceMap = new ConcurrentHashMap();
     }
 }

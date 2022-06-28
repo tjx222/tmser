@@ -17,23 +17,24 @@ import java.util.Map;
 public class ResponseData<T> implements Serializable {
     private static final String CONTENT = "content";
     private static final String TOTAL_ROWS = "total";
-    private static final NullObject DEFAULT_OBJECT_RETUN =  new NullObject();
+    private static final NullObject DEFAULT_OBJECT_RETUN = new NullObject();
+
     public static class NullObject implements Serializable {
     }
 
 
-    private int code;
+    private String code;
     private String message;
     protected T data;
 
-    private ResponseData(){
+    private ResponseData() {
     }
 
-    public static ResponseData error(Object object, String message, Integer errcode) {
+    public static ResponseData error(Object object, String message, String errorCode) {
         ResponseData result = new ResponseData();
         result.data = object != null ? object : DEFAULT_OBJECT_RETUN;
         result.message = Strings.isNullOrEmpty(message) ? CommonError.FAILED.getMessage() : message;
-        result.code = errcode == null ? CommonError.FAILED.getCode() : errcode;
+        result.code = errorCode == null ? CommonError.FAILED.getCode() : errorCode;
         return result;
     }
 
@@ -53,11 +54,11 @@ public class ResponseData<T> implements Serializable {
      * </pre>
      *
      * @param message
-     * @param errcode
+     * @param errCode
      * @return
      */
-    public static ResponseData error(String message, Integer errcode) {
-        return error(null, message, errcode);
+    public static ResponseData error(String message, String errCode) {
+        return error(null, message, errCode);
     }
 
     /**
@@ -74,19 +75,16 @@ public class ResponseData<T> implements Serializable {
      * @return
      */
     public static ResponseData error(String message) {
-        return error(null,message, null);
+        return error(null, message, null);
     }
 
     public static ResponseData error(BaseException exception) {
-        return error(null,exception.getMessage(), exception.getErrorCode());
-    }
-    public static ResponseData error(Object object,BaseException exception) {
-        return error(object,exception.getMessage(), exception.getErrorCode());
-    }
-    public static ResponseData error(Object object, Integer errcode) {
-        return error(object, null, errcode);
+        return error(null, exception.getMessage(), exception.getErrorCode());
     }
 
+    public static ResponseData error(Object object, BaseException exception) {
+        return error(object, exception.getMessage(), exception.getErrorCode());
+    }
 
     /**
      * eg.
@@ -100,24 +98,7 @@ public class ResponseData<T> implements Serializable {
      * @return
      */
     public static ResponseData error() {
-        return error(null,null, null);
-    }
-
-    /**
-     * eg.
-     * <p>
-     * <pre>
-     *      {
-     *          "ret" : false
-     *          "errcode" : 1
-     *      }
-     * </pre>
-     *
-     * @param errcode
-     * @return
-     */
-    public static ResponseData error(Integer errcode) {
-        return error(null,null, errcode);
+        return error(null, null, null);
     }
 
     /**
@@ -183,23 +164,6 @@ public class ResponseData<T> implements Serializable {
      * <pre>
      *      {
      *          "code" : 0,
-     *          "message";"xxx"
-     *      }
-     * </pre>
-     *
-     * @param msg
-     * @return
-     */
-    public static ResponseData success(String msg) {
-        return success(null, msg);
-    }
-
-    /**
-     * eg.
-     * <p>
-     * <pre>
-     *      {
-     *          "code" : 0,
      *          "message": "SUCCESS"
      *      }
      * </pre>
@@ -248,11 +212,11 @@ public class ResponseData<T> implements Serializable {
     public static <T> ResponseData list(int totalRows, Collection<T> list) {
         ResponseData result = new ResponseData();
         Map<String, Object> map = Maps.newHashMap();
-        if (totalRows == 0){
+        if (totalRows == 0) {
             totalRows = list.size();
         }
 
-        if(list != null){
+        if (list != null) {
             map.put(CONTENT, list);
         }
         map.put(TOTAL_ROWS, totalRows);
@@ -262,26 +226,26 @@ public class ResponseData<T> implements Serializable {
         return result;
     }
 
-    public Collection<T> content(){
-        if (this.data == null){
+    public Collection<T> content() {
+        if (this.data == null) {
             return Collections.emptyList();
         }
-        if (this.data instanceof Map){
-            return (List)((Map) this.data).get(CONTENT);
-        }else if(this.data instanceof List){
-            return (List)this.data;
+        if (this.data instanceof Map) {
+            return (List) ((Map) this.data).get(CONTENT);
+        } else if (this.data instanceof List) {
+            return (List) this.data;
         }
         return Collections.emptyList();
     }
 
-    public Integer total(){
-        if (this.data == null){
+    public Integer total() {
+        if (this.data == null) {
             return 0;
         }
-        if (this.data instanceof Map){
+        if (this.data instanceof Map) {
             return (Integer) ((Map) this.data).get(TOTAL_ROWS);
-        }else if(this.data instanceof List){
-            return  ((List) this.data).size();
+        } else if (this.data instanceof List) {
+            return ((List) this.data).size();
         }
         return 0;
     }

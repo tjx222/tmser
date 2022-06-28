@@ -3,6 +3,7 @@ package com.tmser.sensitive;
 import java.lang.annotation.*;
 
 /**
+ * 针对方法返回值为map 时，使用该注解标记要进行处理的key
  * @author tmser
  * @version 1.0
  * @title
