@@ -6,5 +6,6 @@ core/.project
 *.project
 *.log
 *.settings
+.idea
 .idea/**
 *.iml

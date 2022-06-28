@@ -1,0 +1,33 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  http:
+    encoding.charset: UTF-8
+    encoding.force: true
+  application:
+    name: tmser-blog-web
+  servlet:
+    multipart:
+      max-file-size: 3072MB
+      max-request-size: 3072MB
+
+server:
+  tomcat:
+    accesslog:
+      enabled: true
+      directory: /data/www/logs/blog
+      suffix: .log
+      pattern: traceId=[%{traceId}i],rpcId=[%{rpcId}i],remote_addr=[%a],http_x_forward=[%{X-Forwarded-For}i],time=[%{yyyy-MM-dd HH:mm:ss SSS}t],request=[%r],status=[%s],byte=[%b],elapsed=[%T],refer=[%{Referer}i],ua=[%{User-Agent}i],x=[%X]
+      prefix: tomcat-access_log
+      maxDays: 15
+mybatis-plus:
+  type-enums-package: com.tmser.blog.model.enums
+  config-location: classpath:mybatis/mybatis-config.xml
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.tmser.blog.po
+  sensitive:
+    enable: true
+
+logging:
+  level:
+    com.tmser.blog.dao: debug

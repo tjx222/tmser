@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <settings>
+        <setting name="defaultStatementTimeout" value="300"/>
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <setting name="logImpl" value="SLF4J"/>
+    </settings>
+    <typeHandlers>
+        <typeHandler handler="com.tmser.database.mybatis.BooleanTypeHandler" javaType="Boolean" jdbcType="TINYINT"/>
+        <typeHandler handler="com.tmser.database.mybatis.MoneyTypeHandler" javaType="com.tmser.model.money.Money" jdbcType="DECIMAL"/>
+        <typeHandler handler="com.tmser.database.mybatis.ArrayTypeHandler" javaType="[Ljava.lang.String;"/>
+        <typeHandler handler="com.tmser.database.mybatis.ArrayTypeHandler" javaType="[Ljava.lang.Integer;"/>
+        <typeHandler handler="com.tmser.database.mybatis.ArrayTypeHandler" javaType="[Ljava.lang.Integer;"/>
+        <typeHandler handler="org.apache.ibatis.type.LocalDateTimeTypeHandler" />
+        <typeHandler handler="org.apache.ibatis.type.LocalDateTypeHandler" />
+        <typeHandler handler="org.apache.ibatis.type.LocalTimeTypeHandler" />
+    </typeHandlers>
+  <!--  <plugins>
+        <plugin interceptor="com.tmser.database.mybatis.MyBatisInterceptor"></plugin>
+    </plugins>-->
+</configuration>
