@@ -4,7 +4,9 @@ import com.tmser.blog.model.entity.PostCategory;
 import com.tmser.blog.model.enums.PostStatus;
 import com.tmser.blog.repository.base.BaseRepository;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import org.springframework.lang.NonNull;
 
 import java.util.Collection;
@@ -29,9 +31,8 @@ public interface PostCategoryRepository extends BaseRepository<PostCategory> {
      * @return a list of category id
      */
     @NonNull
-    @Select("select postCategory.categoryId from PostCategory postCategory where postCategory"
-            + ".postId = ?1")
-    Set<Integer> findAllCategoryIdsByPostId(@NonNull Integer postId);
+    @Select("select category_id from post_categories  where post_id = #{postId}")
+    Set<Integer> findAllCategoryIdsByPostId(@NonNull @Param("postId") Integer postId);
 
     /**
      * Finds all post ids by category id.
@@ -40,9 +41,8 @@ public interface PostCategoryRepository extends BaseRepository<PostCategory> {
      * @return a set of post id
      */
     @NonNull
-    @Select("select postCategory.postId from PostCategory postCategory where postCategory"
-            + ".categoryId = ?1")
-    Set<Integer> findAllPostIdsByCategoryId(@NonNull Integer categoryId);
+    @Select("select post_id from post_categories where category_id = #{categoryId}")
+    Set<Integer> findAllPostIdsByCategoryId(@NonNull @Param("categoryId") Integer categoryId);
 
     /**
      * Finds all post ids by category id and post status.
@@ -52,10 +52,10 @@ public interface PostCategoryRepository extends BaseRepository<PostCategory> {
      * @return a set of post id
      */
     @NonNull
-    @Select("select postCategory.postId from PostCategory postCategory, Post post where "
-            + "postCategory.categoryId = ?1 and post.id = postCategory.postId and post.status = ?2")
-    Set<Integer> findAllPostIdsByCategoryId(@NonNull Integer categoryId,
-                                            @NonNull PostStatus status);
+    @Select("select postCategory.post_id from post_categories postCategory, posts post where "
+            + "postCategory.category_id = #{categoryId} and post.id = postCategory.post_id and post.status = #{status}")
+    Set<Integer> findAllPostIdsByCategoryId(@NonNull @Param("categoryId")  Integer categoryId,
+                                            @NonNull @Param("status") PostStatus status);
 
     /**
      * Finds all post ids by category id and post status.
@@ -65,10 +65,14 @@ public interface PostCategoryRepository extends BaseRepository<PostCategory> {
      * @return a set of post id
      */
     @NonNull
-    @Select("select postCategory.postId from PostCategory postCategory, Post post where"
-            + " postCategory.categoryId = ?1 and post.id = postCategory.postId and post.status in (?2)")
+    @Select({"<script>","select p.post_id from post_categories p, posts post where" +
+            " p.category_id = #{categoryId} and post.id = p.post_id and post.status in",
+            "<foreach item='item' index='index' collection='items' open='(' separator=',' close=')'>",
+            "#{item}",
+            "</foreach>",
+            "</script>"})
     Set<Integer> findAllPostIdsByCategoryId(
-            @NonNull Integer categoryId, @NonNull Set<PostStatus> status);
+            @NonNull@Param("categoryId")  Integer categoryId, @NonNull Set<PostStatus> status);
 
     /**
      * Finds all post categories by post id in.
@@ -77,6 +81,11 @@ public interface PostCategoryRepository extends BaseRepository<PostCategory> {
      * @return a list of post category
      */
     @NonNull
+    @Select({"<script>","select * from post_categories  where post_id in",
+            "<foreach item='item' index='index' collection='items' open='(' separator=',' close=')'>",
+            "#{item}",
+            "</foreach>",
+            "</script>"})
     List<PostCategory> findAllByPostIdIn(@NonNull Collection<Integer> postIds);
 
     /**
@@ -86,7 +95,8 @@ public interface PostCategoryRepository extends BaseRepository<PostCategory> {
      * @return a list of post category
      */
     @NonNull
-    List<PostCategory> findAllByPostId(@NonNull Integer postId);
+    @Select("select * from post_categories where post_id = #{postId}")
+    List<PostCategory> findAllByPostId(@NonNull @Param("postId") Integer postId);
 
     /**
      * Finds all post categories by category id.
@@ -95,7 +105,8 @@ public interface PostCategoryRepository extends BaseRepository<PostCategory> {
      * @return a list of post category
      */
     @NonNull
-    List<PostCategory> findAllByCategoryId(@NonNull Integer categoryId);
+    @Select("select * from post_categories where category_id = #{categoryId}")
+    List<PostCategory> findAllByCategoryId(@NonNull @Param("categoryId") Integer categoryId);
 
     /**
      * Deletes post categories by post id.
@@ -104,7 +115,8 @@ public interface PostCategoryRepository extends BaseRepository<PostCategory> {
      * @return a list of post category deleted
      */
     @NonNull
-    List<PostCategory> deleteByPostId(@NonNull Integer postId);
+    @Update("delete from post_categories where post_id = #{postId}")
+    void deleteByPostId(@NonNull Integer postId);
 
     /**
      * Deletes post categories by category id.
@@ -113,7 +125,8 @@ public interface PostCategoryRepository extends BaseRepository<PostCategory> {
      * @return a list of post category deleted
      */
     @NonNull
-    List<PostCategory> deleteByCategoryId(@NonNull Integer categoryId);
+    @Update("delete from post_categories where category_id = #{categoryId}")
+    void deleteByCategoryId(@NonNull Integer categoryId);
 
     /**
      * Finds all post categories by category id list.
@@ -121,7 +134,11 @@ public interface PostCategoryRepository extends BaseRepository<PostCategory> {
      * @param categoryIdList category id list must not be empty
      * @return a list of post category
      */
-    @Select("select pc from PostCategory pc where pc.categoryId in (?1)")
+    @Select({"<script>","select * from post_categories  where category_id in",
+            "<foreach item='item' index='index' collection='items' open='(' separator=',' close=')'>",
+            "#{item}",
+            "</foreach>",
+            "</script>"})
     @NonNull
     List<PostCategory> findAllByCategoryIdList(List<Integer> categoryIdList);
 }

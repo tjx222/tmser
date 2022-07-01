@@ -6,6 +6,7 @@ import com.tmser.blog.model.projection.CommentChildrenCountProjection;
 import com.tmser.blog.model.projection.CommentCountProjection;
 import com.tmser.blog.repository.base.BaseCommentRepository;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.lang.NonNull;
 
@@ -28,13 +29,15 @@ public interface JournalCommentRepository extends BaseCommentRepository<JournalC
      * @param postIds post id collection must not be null
      * @return a list of CommentCountProjection
      */
-    @Select(
-            "select new com.tmser.blog.model.projection.CommentCountProjection(count(comment.id), "
-                    + "comment.postId) "
-                    + "from JournalComment comment "
-                    + "where comment.postId in ?1 group by comment.postId")
     @NonNull
     @Override
+    @Select({"<script>"," select count(comment.id) `count`, comment.post_id postId " +
+            "from comments comment where comment.type = 2 and comment.post_id in ",
+            "<foreach item='item' index='index' collection='items' open='(' separator=',' close=')'>",
+            "#{item}",
+            "</foreach>",
+            " group by comment.post_id",
+            " </script>"})
     List<CommentCountProjection> countByPostIds(@NonNull Collection<Integer> postIds);
 
     /**
@@ -44,16 +47,16 @@ public interface JournalCommentRepository extends BaseCommentRepository<JournalC
      * @param journalsId journal id collection must not be null
      * @return a list of comment count
      */
-    @Select(
-            "select new com.tmser.blog.model.projection.CommentCountProjection(count(comment.id), "
-                    + "comment.postId) "
-                    + "from JournalComment comment "
-                    + "where comment.status = ?1 "
-                    + "and comment.postId in ?2 "
-                    + "group by comment.postId")
     @NonNull
+    @Select({"<script>"," select count(comment.id) `count`, comment.post_id postId " +
+            "from comments comment where comment.type = 2 and comment.status = #{status} and comment.post_id in ",
+            "<foreach item='item' index='index' collection='items' open='(' separator=',' close=')'>",
+            "#{item}",
+            "</foreach>",
+            " group by comment.post_id",
+            " </script>"})
     @Override
-    List<CommentCountProjection> countByStatusAndPostIds(@NonNull CommentStatus status,
+    List<CommentCountProjection> countByStatusAndPostIds(@NonNull@Param("status") CommentStatus status,
                                                          @NonNull Collection<Integer> journalsId);
 
     /**
@@ -62,13 +65,14 @@ public interface JournalCommentRepository extends BaseCommentRepository<JournalC
      * @param commentIds comment ids must not be null.
      * @return a list of CommentChildrenCountProjection
      */
-    @Select(
-            "select new com.tmser.blog.model.projection.CommentChildrenCountProjection(count(comment"
-                    + ".id), comment.parentId) "
-                    + "from JournalComment comment "
-                    + "where comment.parentId in ?1 "
-                    + "group by comment.parentId")
     @NonNull
+    @Select({"<script>"," select count(comment.id) directChildrenCount, comment.parent_id commentId " +
+            "from comments comment where comment.type = 0 and comment.parent_id in ",
+            "<foreach item='item' index='index' collection='items' open='(' separator=',' close=')'>",
+            "#{item}",
+            "</foreach>",
+            " group by comment.parent_id",
+            " </script>"})
     List<CommentChildrenCountProjection> findDirectChildrenCount(
             @NonNull Collection<Long> commentIds);
 }

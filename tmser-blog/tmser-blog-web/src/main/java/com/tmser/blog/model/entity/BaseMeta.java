@@ -39,11 +39,7 @@ public class BaseMeta extends BaseEntity {
     @Column(name = "post_id", nullable = false)
     private Integer postId;
 
-    /**
-     * type
-     */
-    @Column(name = "type", nullable = false)
-    private Integer type;
+
 
     /**
      * meta key

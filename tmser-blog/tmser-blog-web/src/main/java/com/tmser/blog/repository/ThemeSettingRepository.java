@@ -3,6 +3,9 @@ package com.tmser.blog.repository;
 import com.tmser.blog.model.entity.ThemeSetting;
 import com.tmser.blog.repository.base.BaseRepository;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import org.springframework.lang.NonNull;
 
 import java.util.List;
@@ -24,6 +27,7 @@ public interface ThemeSettingRepository extends BaseRepository<ThemeSetting> {
      * @return a list of theme setting
      */
     @NonNull
+    @Select("select * from theme_settings where theme_id = #{themeId} ")
     List<ThemeSetting> findAllByThemeId(@NonNull String themeId);
 
     /**
@@ -33,7 +37,8 @@ public interface ThemeSettingRepository extends BaseRepository<ThemeSetting> {
      * @param key     setting key must not be blank
      * @return affected row(s)
      */
-    long deleteByThemeIdAndKey(@NonNull String themeId, @NonNull String key);
+    @Update("delete from theme_settings where theme_id = #{themeId} and setting_key=#{key} ")
+    long deleteByThemeIdAndKey(@NonNull @Param("themeId") String themeId, @Param("key") @NonNull String key);
 
     /**
      * Finds theme settings by theme id and setting key.
@@ -43,13 +48,15 @@ public interface ThemeSettingRepository extends BaseRepository<ThemeSetting> {
      * @return an optional theme setting
      */
     @NonNull
-    Optional<ThemeSetting> findByThemeIdAndKey(@NonNull String themeId, @NonNull String key);
+    @Select("select * from theme_settings where theme_id = #{themeId} and setting_key=#{key} ")
+    Optional<ThemeSetting> findByThemeIdAndKey(@NonNull @Param("themeId") String themeId, @NonNull @Param("key") String key);
 
     /**
      * Deletes inactivated theme settings.
      *
      * @param activatedThemeId activated theme id.
      */
+    @Update("delete from theme_settings where theme_id <> #{activatedThemeId}")
     void deleteByThemeIdIsNot(@NonNull String activatedThemeId);
 
     /**
@@ -57,5 +64,6 @@ public interface ThemeSettingRepository extends BaseRepository<ThemeSetting> {
      *
      * @param themeId theme id.
      */
-    void deleteByThemeId(String themeId);
+    @Update("delete from theme_settings where theme_id = #{themeId}")
+    void deleteByThemeId(@Param("themeId") String themeId);
 }

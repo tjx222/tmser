@@ -28,7 +28,7 @@ public interface PostRepository extends BasePostRepository<Post> {
      * @return visits.
      */
     @Override
-    @Select("select sum(p.visits) from Post p")
+    @Select("select sum(p.visits) from posts p where p.type = 0")
     Long countVisit();
 
     /**
@@ -37,7 +37,7 @@ public interface PostRepository extends BasePostRepository<Post> {
      * @return likes.
      */
     @Override
-    @Select("select sum(p.likes) from Post p")
+    @Select("select sum(p.likes) from posts p where p.type = 0")
     Long countLike();
 
     /**
@@ -48,8 +48,8 @@ public interface PostRepository extends BasePostRepository<Post> {
      * @param slug  post slug
      * @return a optional of post
      */
-    @Select("select post from Post post where year(post.createTime) = :year and month(post"
-            + ".createTime) = :month and post.slug = :slug")
+    @Select("select * from posts post where post.type = 0 and year(post.create_time) = #{year} and month(post"
+            + ".create_time) = #{month} and post.slug = #{slug}")
     Optional<Post> findBy(@Param("year") Integer year, @Param("month") Integer month,
                           @Param("slug") String slug);
 
@@ -60,7 +60,7 @@ public interface PostRepository extends BasePostRepository<Post> {
      * @param slug post slug
      * @return a optional of post
      */
-    @Select("select post from Post post where year(post.createTime) = :year and post.slug = :slug")
+    @Select("select * from posts post where post.type = 0 and year(post.create_time) = #{year} and post.slug = #{slug}")
     Optional<Post> findBy(@Param("year") Integer year, @Param("slug") String slug);
 
 
@@ -73,8 +73,8 @@ public interface PostRepository extends BasePostRepository<Post> {
      * @param status post status
      * @return a optional of post
      */
-    @Select("select post from Post post where year(post.createTime) = :year and month(post"
-            + ".createTime) = :month and post.slug = :slug and post.status = :status")
+    @Select("select * from posts post where post.type = 0 and year(post.create_time) = #{year} and month(post"
+            + ".create_time) = #{month} and post.slug = #{slug} and post.status = #{status}")
     Optional<Post> findBy(@Param("year") Integer year, @Param("month") Integer month,
                           @Param("slug") String slug, @Param("status") PostStatus status);
 
@@ -87,8 +87,8 @@ public interface PostRepository extends BasePostRepository<Post> {
      * @param slug  post slug
      * @return a optional of post
      */
-    @Select("select post from Post post where year(post.createTime) = :year and month(post"
-            + ".createTime) = :month and day(post.createTime) = :day and post.slug = :slug")
+    @Select("select * from posts post where post.type = 0 and year(post.create_time) = #{year} and month(post"
+            + ".create_time) = #{month} and day(post.create_time) = #{day} and post.slug = #{slug}")
     Optional<Post> findBy(@Param("year") Integer year, @Param("month") Integer month,
                           @Param("day") Integer day, @Param("slug") String slug);
 
@@ -102,13 +102,17 @@ public interface PostRepository extends BasePostRepository<Post> {
      * @param status post status
      * @return a optional of post
      */
-    @Select("select post from Post post where year(post.createTime) = :year and month(post"
-            + ".createTime) = :month and day(post.createTime) = :day and post.slug = :slug and post"
-            + ".status = :status")
+    @Select("select * from posts post where post.type = 0 and year(post.create_time) = #{year} and month(post"
+            + ".create_time) = #{month} and day(post.create_time) = :day and post.slug = #{slug} and post"
+            + ".status = #{status}")
     Optional<Post> findBy(@Param("year") Integer year, @Param("month") Integer month,
                           @Param("day") Integer day, @Param("slug") String slug, @Param("status") PostStatus status);
 
 
+    @Select({"<script>"," select * from posts where type = 0 and id in ",
+            "<foreach item='item' index='index' collection='items' open='(' separator=',' close=')'>",
+            "#{item}",
+            "</foreach></script>"})
     IPage<Post> findAllByIdIn(Collection<Integer> postIds, IPage page);
 
 }

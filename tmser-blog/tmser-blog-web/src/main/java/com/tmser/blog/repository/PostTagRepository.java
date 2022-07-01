@@ -5,7 +5,9 @@ import com.tmser.blog.model.enums.PostStatus;
 import com.tmser.blog.model.projection.TagPostPostCountProjection;
 import com.tmser.blog.repository.base.BaseRepository;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import org.springframework.lang.NonNull;
 
 import java.util.Collection;
@@ -30,7 +32,8 @@ public interface PostTagRepository extends BaseRepository<PostTag> {
      * @return a list of post tags
      */
     @NonNull
-    List<PostTag> findAllByPostId(@NonNull Integer postId);
+    @Select("select * from post_tags where post_id = #{postId}")
+    List<PostTag> findAllByPostId(@NonNull @Param("postId") Integer postId);
 
     /**
      * Finds all tag ids by post id.
@@ -38,9 +41,9 @@ public interface PostTagRepository extends BaseRepository<PostTag> {
      * @param postId post id must not be null
      * @return a set of tag id
      */
-    @Select("select postTag.tagId from PostTag postTag where postTag.postId = ?1")
+    @Select("select postTag.tag_id from post_tags postTag where postTag.post_id = #{postId}")
     @NonNull
-    Set<Integer> findAllTagIdsByPostId(@NonNull Integer postId);
+    Set<Integer> findAllTagIdsByPostId(@NonNull @Param("postId") Integer postId);
 
     /**
      * Finds all post tags by tag id.
@@ -49,7 +52,8 @@ public interface PostTagRepository extends BaseRepository<PostTag> {
      * @return a list of post tags
      */
     @NonNull
-    List<PostTag> findAllByTagId(@NonNull Integer tagId);
+    @Select("select * from post_tags where tag_id = #{tagId}")
+    List<PostTag> findAllByTagId(@NonNull @Param("tagId") Integer tagId);
 
     /**
      * Finds all post id by tag id.
@@ -57,9 +61,9 @@ public interface PostTagRepository extends BaseRepository<PostTag> {
      * @param tagId tag id must not be null
      * @return a set of post id
      */
-    @Select("select postTag.postId from PostTag postTag where postTag.tagId = ?1")
+    @Select("select postTag.post_id from post_tags postTag where postTag.tag_id = #{tagId}")
     @NonNull
-    Set<Integer> findAllPostIdsByTagId(@NonNull Integer tagId);
+    Set<Integer> findAllPostIdsByTagId(@NonNull @Param("tagId") Integer tagId);
 
     /**
      * Finds all post id by tag id and post status.
@@ -68,10 +72,10 @@ public interface PostTagRepository extends BaseRepository<PostTag> {
      * @param status post status
      * @return a set of post id
      */
-    @Select("select postTag.postId from PostTag postTag,Post post where postTag.tagId = ?1 and "
-            + "post.id = postTag.postId and post.status = ?2")
+    @Select("select postTag.post_id from post_tags postTag, posts post where postTag.tag_id = #{tagId} and "
+            + "post.id = postTag.post_id and post.status = #{status}")
     @NonNull
-    Set<Integer> findAllPostIdsByTagId(@NonNull Integer tagId, @NonNull PostStatus status);
+    Set<Integer> findAllPostIdsByTagId(@NonNull @Param("tagId") Integer tagId, @NonNull @Param("status") PostStatus status);
 
     /**
      * Finds all tags by post id in.
@@ -80,6 +84,10 @@ public interface PostTagRepository extends BaseRepository<PostTag> {
      * @return a list of post tags
      */
     @NonNull
+    @Select({"<script>"," select * from post_tags where post_id in ",
+            "<foreach item='item' index='index' collection='items' open='(' separator=',' close=')'>",
+            "#{item}",
+            "</foreach></script>"})
     List<PostTag> findAllByPostIdIn(@NonNull Collection<Integer> postIds);
 
     /**
@@ -89,7 +97,8 @@ public interface PostTagRepository extends BaseRepository<PostTag> {
      * @return a list of post tag deleted
      */
     @NonNull
-    List<PostTag> deleteByPostId(@NonNull Integer postId);
+    @Update("delete from post_tags where post_id = #{postId}")
+    void deleteByPostId(@NonNull@Param("postId") Integer postId);
 
     /**
      * Deletes post tags by tag id.
@@ -98,7 +107,8 @@ public interface PostTagRepository extends BaseRepository<PostTag> {
      * @return a list of post tag deleted
      */
     @NonNull
-    List<PostTag> deleteByTagId(@NonNull Integer tagId);
+    @Update("delete from post_tags where tag_id = #{tagId}")
+    void deleteByTagId(@NonNull @Param("tagId") Integer tagId);
 
     /**
      * Finds post count by tag id collection.
@@ -106,9 +116,13 @@ public interface PostTagRepository extends BaseRepository<PostTag> {
      * @param tagIds tag id collection must not be null
      * @return a list of tag post count projection
      */
-    @Select("select new com.tmser.blog.model.projection.TagPostPostCountProjection(count(pt.postId),"
-            + " pt.tagId) from PostTag pt where pt.tagId in ?1 group by pt.tagId")
     @NonNull
+    @Select({"<script>","select count(post_id), tag_id from post_tags where post_id in ",
+            "<foreach item='item' index='index' collection='items' open='(' separator=',' close=')'>",
+            "#{item}",
+            "</foreach>",
+            "group by tag_id",
+            "</script>"})
     List<TagPostPostCountProjection> findPostCountByTagIds(@NonNull Collection<Integer> tagIds);
 
     /**
@@ -116,8 +130,7 @@ public interface PostTagRepository extends BaseRepository<PostTag> {
      *
      * @return a list of tag post count projection
      */
-    @Select("select new com.tmser.blog.model.projection.TagPostPostCountProjection(count(pt.postId),"
-            + " pt.tagId) from PostTag pt group by pt.tagId")
     @NonNull
+    @Select("select count(post_id), tag_id from post_tags group by tag_id")
     List<TagPostPostCountProjection> findPostCount();
 }

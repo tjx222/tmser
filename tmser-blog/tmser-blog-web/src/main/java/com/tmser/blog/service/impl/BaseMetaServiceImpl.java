@@ -67,7 +67,9 @@ public abstract class BaseMetaServiceImpl<META extends BaseMeta>
     @Override
     public List<META> removeByPostId(@NonNull Integer postId) {
         Assert.notNull(postId, "Post id must not be null of removeByPostId");
-        return baseMetaRepository.deleteByPostId(postId);
+        List<META> allByPostId = baseMetaRepository.findAllByPostId(postId);
+        baseMetaRepository.deleteByPostId(postId);
+        return allByPostId;
     }
 
     @Override

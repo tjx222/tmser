@@ -4,6 +4,7 @@ import com.tmser.blog.model.entity.Menu;
 import com.tmser.blog.repository.base.BaseRepository;
 import com.tmser.model.sort.Sort;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.lang.NonNull;
 
@@ -25,6 +26,7 @@ public interface MenuRepository extends BaseRepository<Menu> {
      * @param name name must not be null.
      * @return true or false
      */
+    @Select(value = "select 1  from menus where name = #{name} limit 1")
     boolean existsByName(@NonNull String name);
 
     /**
@@ -34,7 +36,8 @@ public interface MenuRepository extends BaseRepository<Menu> {
      * @param name name must not be null.
      * @return true or false.
      */
-    boolean existsByIdNotAndName(@NonNull Integer id, @NonNull String name);
+    @Select(value = "select 1  from menus where name = #{name} and id <> #{id} limit 1")
+    boolean existsByIdNotAndName(@Param("id")@NonNull Integer id, @Param("name")@NonNull String name);
 
     /**
      * Finds by menu parent id.
@@ -42,7 +45,8 @@ public interface MenuRepository extends BaseRepository<Menu> {
      * @param id parent id must not be null.
      * @return a list of menu.
      */
-    List<Menu> findByParentId(@NonNull Integer id);
+    @Select(value = "select * from menus where parent_id = #{id}")
+    List<Menu> findByParentId(@NonNull @Param("id") Integer id);
 
     /**
      * Finds by menu team.
@@ -51,13 +55,14 @@ public interface MenuRepository extends BaseRepository<Menu> {
      * @param sort sort.
      * @return a list of menu
      */
-    List<Menu> findByTeam(@NonNull String team, Sort sort);
+    @Select(value = "select * from menus where team = #{team} order by #{sort}")
+    List<Menu> findByTeam(@NonNull @Param("team") String team, @Param("sort") Sort sort);
 
     /**
      * Find all menu teams.
      *
      * @return a list of teams
      */
-    @Select(value = "select distinct a.team from Menu a")
+    @Select(value = "select distinct a.team from menus a")
     List<String> findAllTeams();
 }

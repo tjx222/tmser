@@ -28,12 +28,11 @@ public interface SheetCommentRepository extends BaseCommentRepository<SheetComme
      * @param sheetIds sheet id collection must not be null
      * @return a list of CommentCountProjection
      */
-    @Select(
-            "select new com.tmser.blog.model.projection.CommentCountProjection(count(comment.id), "
-                    + "comment.postId) "
-                    + "from SheetComment comment "
-                    + "where comment.postId in ?1 group by comment.postId")
     @NonNull
+    @Select({"<script>"," select count(comment.id) count, comment.post_id postId from comments comment where type=1 and comment.post_id in",
+            "<foreach item='item' index='index' collection='items' open='(' separator=',' close=')'>",
+            "#{item}",
+            "</foreach> group by comment.post_id </script>"})
     @Override
     List<CommentCountProjection> countByPostIds(@NonNull Collection<Integer> sheetIds);
 
@@ -44,14 +43,14 @@ public interface SheetCommentRepository extends BaseCommentRepository<SheetComme
      * @param sheetsId sheet id collection must not be null
      * @return a list of comment count
      */
-    @Select(
-            "select new com.tmser.blog.model.projection.CommentCountProjection(count(comment.id), "
-                    + "comment.postId) "
-                    + "from SheetComment comment "
-                    + "where comment.status = ?1 "
-                    + "and comment.postId in ?2 "
-                    + "group by comment.postId")
     @NonNull
+    @Select({"<script>"," select count(comment.id) count, comment.post_id postId from comments comment where type = 1 and comment.post_id in",
+            "<foreach item='item' index='index' collection='items' open='(' separator=',' close=')'>",
+            "#{item}",
+            "</foreach>",
+            " and comment.status = #{status} ",
+            " group by comment.post_id",
+            "</script>"})
     @Override
     List<CommentCountProjection> countByStatusAndPostIds(@NonNull CommentStatus status,
                                                          @NonNull Collection<Integer> sheetsId);
@@ -62,13 +61,15 @@ public interface SheetCommentRepository extends BaseCommentRepository<SheetComme
      * @param commentIds comment ids must not be null.
      * @return a list of CommentChildrenCountProjection
      */
-    @Select(
-            "select new com.tmser.blog.model.projection.CommentChildrenCountProjection(count(comment"
-                    + ".id), comment.parentId) "
-                    + "from SheetComment comment "
-                    + "where comment.parentId in ?1 "
-                    + "group by comment.parentId")
     @NonNull
+    @Select({"<script>"," select count(comment.id) directChildrenCount, comment.parent_id commentId " +
+            "from comments comment where type = 1 and comment.parent_id in",
+            "<foreach item='item' index='index' collection='items' open='(' separator=',' close=')'>",
+            "#{item}",
+            "</foreach>",
+            " and comment.status = #{status} ",
+            " group by comment.parent_id",
+            "</script>"})
     List<CommentChildrenCountProjection> findDirectChildrenCount(
             @NonNull Collection<Long> commentIds);
 }

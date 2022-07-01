@@ -3,6 +3,7 @@ package com.tmser.blog.repository;
 import com.tmser.blog.model.entity.Category;
 import com.tmser.blog.repository.base.BaseRepository;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 import org.springframework.lang.NonNull;
 
 import java.io.Serializable;
@@ -23,6 +24,7 @@ public interface CategoryRepository extends BaseRepository<Category> {
      * @param name category name must not be blank
      * @return the count
      */
+    @Select("select count(*) from type where name = #{name}")
     long countByName(@NonNull String name);
 
     /**
@@ -31,6 +33,7 @@ public interface CategoryRepository extends BaseRepository<Category> {
      * @param id category id must not be null
      * @return the count
      */
+    @Select("select count(*) from type where id = #{id}")
     long countById(@NonNull Integer id);
 
     /**
@@ -39,6 +42,7 @@ public interface CategoryRepository extends BaseRepository<Category> {
      * @param slug slug
      * @return Optional of Category
      */
+    @Select("select * from type where slug = #{slug}")
     Optional<Category> getBySlug(@NonNull String slug);
 
     /**
@@ -47,6 +51,7 @@ public interface CategoryRepository extends BaseRepository<Category> {
      * @param name name
      * @return Optional of Category
      */
+    @Select("select * from type where slug = #{slug}")
     Optional<Category> getByName(@NonNull String name);
 
     /**
@@ -55,5 +60,6 @@ public interface CategoryRepository extends BaseRepository<Category> {
      * @param id parent id.
      * @return list of category
      */
+    @Select("select * from type where parent_id = #{id}")
     List<Category> findByParentId(@NonNull Serializable id);
 }

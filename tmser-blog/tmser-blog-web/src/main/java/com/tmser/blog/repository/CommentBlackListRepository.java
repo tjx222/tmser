@@ -23,6 +23,7 @@ public interface CommentBlackListRepository extends BaseRepository<CommentBlackL
      * @param ipAddress ip address
      * @return comment black list or empty
      */
+    @Select("select * from comment_black_list where ip_address = #{ipAddress} ")
     Optional<CommentBlackList> findByIpAddress(String ipAddress);
 
     /**
@@ -31,7 +32,7 @@ public interface CommentBlackListRepository extends BaseRepository<CommentBlackL
      * @param commentBlackList comment black list
      * @return result
      */
-    @Select("UPDATE CommentBlackList SET banTime=:#{#commentBlackList.banTime} WHERE "
-            + "ipAddress=:#{#commentBlackList.ipAddress}")
+    @Select("UPDATE comment_black_list SET ban_time=#{commentBlackList.banTime} WHERE "
+            + "ip_address=#{commentBlackList.ipAddress}")
     int updateByIpAddress(@Param("commentBlackList") CommentBlackList commentBlackList);
 }

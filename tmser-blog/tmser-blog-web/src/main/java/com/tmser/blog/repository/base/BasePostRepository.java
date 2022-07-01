@@ -6,6 +6,7 @@ import com.tmser.blog.model.enums.PostStatus;
 import com.tmser.model.sort.Sort;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import org.springframework.lang.NonNull;
 
 import java.util.Date;
@@ -26,7 +27,7 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      *
      * @return total visits
      */
-    @Select("select sum(p.visits) from BasePost p")
+    @Select("select sum(p.visits) from posts p")
     Long countVisit();
 
     /**
@@ -34,7 +35,7 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      *
      * @return total likes
      */
-    @Select("select sum(p.likes) from BasePost p")
+    @Select("select sum(p.likes) from posts p")
     Long countLike();
 
     /**
@@ -45,6 +46,7 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * @return a page of post
      */
     @NonNull
+    @Select("select * from posts where status = #{status}")
     IPage<POST> findAllByStatus(@NonNull PostStatus status, @NonNull IPage pageable);
 
     /**
@@ -54,6 +56,7 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * @return a list of post
      */
     @NonNull
+    @Select("select * from posts where status = #{status}")
     List<POST> findAllByStatus(@NonNull PostStatus status);
 
     /**
@@ -64,7 +67,8 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * @return a list of post
      */
     @NonNull
-    List<POST> findAllByStatus(@NonNull PostStatus status, @NonNull Sort sort);
+    @Select("select * from posts where status = #{status} order by #{sort}" )
+    List<POST> findAllByStatus(@NonNull @Param("status") PostStatus status, @Param("sort") @NonNull Sort sort);
 
     /**
      * Finds all post by status and create time before.
@@ -75,8 +79,9 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * @return a page of post
      */
     @NonNull
-    IPage<POST> findAllByStatusAndCreateTimeBefore(@NonNull PostStatus status,
-                                                   @NonNull Date createTime, @NonNull IPage pageable);
+    @Select("select * from posts where status = #{status}  and create_time < #{createTime}" )
+    IPage<POST> findAllByStatusAndCreateTimeBefore(@NonNull @Param("status") PostStatus status,
+                                                   @NonNull @Param("createTime") Date createTime, @NonNull IPage pageable);
 
     /**
      * Finds all post by status and create time after.
@@ -87,8 +92,9 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * @return a page of post
      */
     @NonNull
-    IPage<POST> findAllByStatusAndCreateTimeAfter(@NonNull PostStatus status,
-                                                  @NonNull Date createTime, @NonNull IPage pageable);
+    @Select("select * from posts where status = #{status}  and create_time > #{createTime}" )
+    IPage<POST> findAllByStatusAndCreateTimeAfter(@NonNull @Param("status") PostStatus status,
+                                                  @NonNull @Param("createTime")Date createTime, @NonNull IPage pageable);
 
     /**
      * Finds all post by status and edit time before.
@@ -99,7 +105,8 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * @return a page of post
      */
     @NonNull
-    IPage<POST> findAllByStatusAndEditTimeBefore(@NonNull PostStatus status, @NonNull Date editTime,
+    @Select("select * from posts where status = #{status}  and edit_time < #{editTime}" )
+    IPage<POST> findAllByStatusAndEditTimeBefore(@NonNull @Param("status") PostStatus status, @NonNull@Param("editTime") Date editTime,
                                                  @NonNull IPage pageable);
 
     /**
@@ -111,7 +118,8 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * @return a page of post
      */
     @NonNull
-    IPage<POST> findAllByStatusAndEditTimeAfter(@NonNull PostStatus status, @NonNull Date editTime,
+    @Select("select * from posts where status = #{status}  and edit_time > #{editTime}" )
+    IPage<POST> findAllByStatusAndEditTimeAfter(@NonNull @Param("status") PostStatus status, @NonNull@Param("editTime") Date editTime,
                                                 @NonNull IPage pageable);
 
     /**
@@ -123,7 +131,8 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * @return a page of post
      */
     @NonNull
-    IPage<POST> findAllByStatusAndVisitsBefore(@NonNull PostStatus status, @NonNull Long visits,
+    @Select("select * from posts where status = #{status}  and edit_time > #{editTime}" )
+    IPage<POST> findAllByStatusAndVisitsBefore(@NonNull @Param("status") PostStatus status, @NonNull Long visits,
                                                @NonNull IPage pageable);
 
     /**
@@ -135,7 +144,8 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * @return a page of post
      */
     @NonNull
-    IPage<POST> findAllByStatusAndVisitsAfter(@NonNull PostStatus status, @NonNull Long visits,
+    @Select("select * from posts where status = #{status}  and visits > #{visits}" )
+    IPage<POST> findAllByStatusAndVisitsAfter(@NonNull @Param("status") PostStatus status, @NonNull @Param("visits") Long visits,
                                               @NonNull IPage pageable);
 
     /**
@@ -146,7 +156,8 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * @return an optional post
      */
     @NonNull
-    Optional<POST> getBySlugAndStatus(@NonNull String slug, @NonNull PostStatus status);
+    @Select("select * from posts where status = #{status}  and slug = #{slug}" )
+    Optional<POST> getBySlugAndStatus(@NonNull @Param("slug") String slug, @NonNull @Param("status") PostStatus status);
 
     /**
      * Gets post by id and status.
@@ -156,7 +167,8 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * @return an optional post
      */
     @NonNull
-    Optional<POST> getByIdAndStatus(@NonNull Integer id, @NonNull PostStatus status);
+    @Select("select * from posts where status = #{status}  and id = #{id}" )
+    Optional<POST> getByIdAndStatus(@NonNull @Param("id") Integer id, @NonNull @Param("status") PostStatus status);
 
 
     /**
@@ -165,7 +177,8 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * @param status status
      * @return posts count
      */
-    long countByStatus(@NonNull PostStatus status);
+    @Select("select count(*) from posts where status = #{status}" )
+    long countByStatus(@NonNull @Param("status") PostStatus status);
 
     /**
      * Determine if the slug exists.
@@ -173,7 +186,8 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * @param slug slug must not be null.
      * @return true or false.
      */
-    boolean existsBySlug(@NonNull String slug);
+    @Select("select 1 from posts where slug = #{slug} limit 1" )
+    boolean existsBySlug(@NonNull @Param("slug") String slug);
 
     /**
      * Determine if the slug exists.
@@ -182,7 +196,8 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * @param slug slug must not be null.
      * @return true or false.
      */
-    boolean existsByIdNotAndSlug(@NonNull Integer id, @NonNull String slug);
+    @Select("select 1 from posts where slug = #{slug} and id = #{id} limit 1" )
+    boolean existsByIdNotAndSlug(@NonNull @Param("id") Integer id, @Param("slug") @NonNull String slug);
 
     /**
      * Get post by slug
@@ -190,6 +205,7 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * @param slug post slug
      * @return post or empty
      */
+    @Select("select * from posts where slug = #{slug} limit 1" )
     Optional<POST> getBySlug(@NonNull String slug);
 
     /**
@@ -199,7 +215,7 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * @param postId post id must not be null
      * @return updated rows
      */
-    @Select("update BasePost p set p.visits = p.visits + :visits where p.id = :postId")
+    @Update("update posts p set p.visits = p.visits + #{visits} where p.id = #{postId}")
     int updateVisit(@Param("visits") long visits, @Param("postId") @NonNull Integer postId);
 
     /**
@@ -209,7 +225,7 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * @param postId post id must not be null
      * @return updated rows
      */
-    @Select("update BasePost p set p.likes = p.likes + :likes where p.id = :postId")
+    @Update("update posts p set p.likes = p.likes + #{likes} where p.id = #{postId}")
     int updateLikes(@Param("likes") long likes, @Param("postId") @NonNull Integer postId);
 
     /**
@@ -219,7 +235,7 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * @param postId post id must not be null.
      * @return updated rows.
      */
-    @Select("update BasePost p set p.status = :status where p.id = :postId")
+    @Update("update posts p set p.status = #{status} where p.id = #{postId}")
     int updateStatus(@Param("status") @NonNull PostStatus status,
                      @Param("postId") @NonNull Integer postId);
 }

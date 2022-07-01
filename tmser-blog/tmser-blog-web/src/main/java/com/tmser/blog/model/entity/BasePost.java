@@ -21,7 +21,6 @@ import java.util.Date;
  */
 @Data
 @Entity(name = "BasePost")
-
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class BasePost extends BaseEntity {

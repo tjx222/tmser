@@ -28,7 +28,8 @@ public interface JournalRepository
      * @return a page of journal
      */
     @NonNull
-    IPage<Journal> findAllByType(@NonNull JournalType type, @NonNull IPage pageable);
+    @Select("select * from journals where type = #{type}")
+    IPage<Journal> findAllByType(@Param("type") @NonNull JournalType type, @NonNull IPage pageable);
 
     /**
      * Updates journal likes.
@@ -37,6 +38,6 @@ public interface JournalRepository
      * @param id    id must not be null
      * @return updated rows
      */
-    @Select("update Journal j set j.likes = j.likes + :likes where j.id = :id")
+    @Select("update journals j set j.likes = j.likes + #{likes} where j.id = #{id}")
     int updateLikes(@Param("likes") long likes, @Param("id") @NonNull Integer id);
 }

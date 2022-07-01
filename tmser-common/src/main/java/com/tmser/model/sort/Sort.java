@@ -608,18 +608,7 @@ public class Sort implements Streamable<Sort.Order>, Serializable {
          */
         @Override
         public String toString() {
-
-            String result = String.format("%s: %s", property, direction);
-
-            if (!NullHandling.NATIVE.equals(nullHandling)) {
-                result += ", " + nullHandling;
-            }
-
-            if (ignoreCase) {
-                result += ", ignoring case";
-            }
-
-            return result;
+            return String.format("%s %s", property, direction);
         }
     }
 }

@@ -24,7 +24,7 @@ public interface SheetRepository extends BasePostRepository<Sheet> {
      * @return visits.
      */
     @Override
-    @Select("select sum(p.visits) from Sheet p")
+    @Select("select sum(p.visits) from posts p where p.type = 1")
     Long countVisit();
 
     /**
@@ -33,7 +33,7 @@ public interface SheetRepository extends BasePostRepository<Sheet> {
      * @return likes.
      */
     @Override
-    @Select("select sum(p.likes) from Sheet p")
+    @Select("select sum(p.likes) from posts p where p.type = 1")
     Long countLike();
 
     /**
@@ -45,5 +45,6 @@ public interface SheetRepository extends BasePostRepository<Sheet> {
      */
     @NonNull
     @Override
+    @Select("select * from posts  where type = 1 and slug=#{slug} and status = #{status}")
     Optional<Sheet> getBySlugAndStatus(@NonNull String slug, @NonNull PostStatus status);
 }

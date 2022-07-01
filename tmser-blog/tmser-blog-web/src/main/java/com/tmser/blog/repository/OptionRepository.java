@@ -3,6 +3,7 @@ package com.tmser.blog.repository;
 import com.tmser.blog.model.entity.Option;
 import com.tmser.blog.repository.base.BaseRepository;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
@@ -26,7 +27,7 @@ public interface OptionRepository
      * @return Option
      */
     @Select("select * from options where option_key = #{key}")
-    Optional<Option> findByKey(String key);
+    Optional<Option> findByKey(@Param("key") String key);
 
     /**
      * Delete option by key
@@ -34,5 +35,5 @@ public interface OptionRepository
      * @param key key
      */
     @Update("delete from options where option_key = #{key}")
-    void deleteByKey(String key);
+    void deleteByKey(@Param("key") String key);
 }

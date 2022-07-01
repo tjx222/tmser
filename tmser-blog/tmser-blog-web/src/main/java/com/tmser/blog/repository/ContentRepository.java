@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 /**
  * Base content repository.
  *
- * @author guqing
+ * @author tmser
  * @date 2021-12-18
  */
 @Mapper

@@ -6,6 +6,7 @@ import com.tmser.blog.model.projection.CommentChildrenCountProjection;
 import com.tmser.blog.model.projection.CommentCountProjection;
 import com.tmser.blog.repository.base.BaseCommentRepository;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.lang.NonNull;
 
@@ -29,13 +30,15 @@ public interface PostCommentRepository extends BaseCommentRepository<PostComment
      * @param postIds post id collection must not be null
      * @return a list of CommentCountProjection
      */
-    @Select(
-            "select new com.tmser.blog.model.projection.CommentCountProjection(count(comment.id), "
-                    + "comment.postId) "
-                    + "from PostComment comment "
-                    + "where comment.postId in ?1 group by comment.postId")
     @NonNull
     @Override
+    @Select({"<script>"," select count(comment.id) `count`, comment.post_id postId " +
+            "from comments comment where comment.type = 0 and comment.post_id in ",
+            "<foreach item='item' index='index' collection='items' open='(' separator=',' close=')'>",
+            "#{item}",
+            "</foreach>",
+            " group by comment.post_id",
+            " </script>"})
     List<CommentCountProjection> countByPostIds(@NonNull Collection<Integer> postIds);
 
     /**
@@ -45,16 +48,16 @@ public interface PostCommentRepository extends BaseCommentRepository<PostComment
      * @param postsId post id collection must not be null
      * @return a list of comment count
      */
-    @Select(
-            "select new com.tmser.blog.model.projection.CommentCountProjection(count(comment.id), "
-                    + "comment.postId) "
-                    + "from PostComment comment "
-                    + "where comment.status = ?1 "
-                    + "and comment.postId in ?2 "
-                    + "group by comment.postId")
     @NonNull
+    @Select({"<script>"," select count(comment.id) `count`, comment.post_id postId " +
+            "from comments comment where comment.type = 0 and comment.status = #{status} and comment.post_id in ",
+            "<foreach item='item' index='index' collection='items' open='(' separator=',' close=')'>",
+            "#{item}",
+            "</foreach>",
+            " group by comment.post_id",
+            " </script>"})
     @Override
-    List<CommentCountProjection> countByStatusAndPostIds(@NonNull CommentStatus status,
+    List<CommentCountProjection> countByStatusAndPostIds(@NonNull@Param("status") CommentStatus status,
                                                          @NonNull Collection<Integer> postsId);
 
     /**
@@ -63,13 +66,14 @@ public interface PostCommentRepository extends BaseCommentRepository<PostComment
      * @param commentIds comment ids must not be null.
      * @return a list of CommentChildrenCountProjection
      */
-    @Select(
-            "select new com.tmser.blog.model.projection.CommentChildrenCountProjection(count(comment"
-                    + ".id), comment.parentId) "
-                    + "from PostComment comment "
-                    + "where comment.parentId in ?1 "
-                    + "group by comment.parentId")
     @NonNull
+    @Select({"<script>"," select count(comment.id) directChildrenCount, comment.parent_id commentId " +
+            "from comments comment where comment.type = 0 and comment.parent_id in ",
+            "<foreach item='item' index='index' collection='items' open='(' separator=',' close=')'>",
+            "#{item}",
+            "</foreach>",
+            " group by comment.parent_id",
+            " </script>"})
     List<CommentChildrenCountProjection> findDirectChildrenCount(
             @NonNull Collection<Long> commentIds);
 
@@ -81,7 +85,9 @@ public interface PostCommentRepository extends BaseCommentRepository<PostComment
      * @param endTime   结束时间
      * @return 评论次数
      */
-    @Select("SELECT COUNT(id) FROM PostComment WHERE ipAddress=?1 AND updateTime BETWEEN ?2 AND ?3"
+    @Select("SELECT COUNT(id) FROM comments WHERE ip_address=#{ipAddress} AND update_time BETWEEN #{startTime} AND #{endTime}"
             + " AND status <> 2")
-    int countByIpAndTime(String ipAddress, Date startTime, Date endTime);
+    int countByIpAndTime(@Param("ipAddress") String ipAddress,
+                         @Param("startTime") Date startTime,
+                         @Param("endTime") Date endTime);
 }

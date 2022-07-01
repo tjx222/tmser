@@ -3,6 +3,7 @@ package com.tmser.blog.repository;
 import com.tmser.blog.model.entity.User;
 import com.tmser.blog.repository.base.BaseRepository;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 import org.springframework.lang.NonNull;
 
 import java.util.Optional;
@@ -22,6 +23,7 @@ public interface UserRepository extends BaseRepository<User> {
      * @return an optional user
      */
     @NonNull
+    @Select("select * from users where username = #{username}")
     Optional<User> findByUsername(@NonNull String username);
 
     /**
@@ -31,5 +33,6 @@ public interface UserRepository extends BaseRepository<User> {
      * @return an optional user
      */
     @NonNull
+    @Select("select * from users where email = #{email}")
     Optional<User> findByEmail(@NonNull String email);
 }

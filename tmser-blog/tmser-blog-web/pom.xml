@@ -264,13 +264,21 @@
         <!--            <artifactId>spring-boot-devtools</artifactId>-->
         <!--            <scope>provided</scope>-->
         <!--        </dependency>-->
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
-        <plugins>
-        </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
     </build>
-
     <profiles>
         <profile>
             <id>local</id>

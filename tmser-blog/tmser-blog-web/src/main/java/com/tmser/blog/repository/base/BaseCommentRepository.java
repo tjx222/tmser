@@ -7,7 +7,10 @@ import com.tmser.blog.model.enums.CommentStatus;
 import com.tmser.blog.model.projection.CommentChildrenCountProjection;
 import com.tmser.blog.model.projection.CommentCountProjection;
 import com.tmser.model.sort.Sort;
+import com.tmser.spring.web.PageableDefault;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
@@ -34,7 +37,8 @@ public interface BaseCommentRepository<COMMENT extends BaseComment>
      */
     @NonNull
     @SensitiveConceal
-    IPage<COMMENT> findAllByStatus(@Nullable CommentStatus status, @NonNull IPage pageable);
+    @Select("select * from comments where status = #{status}")
+    IPage<COMMENT> findAllByStatus(@Nullable @Param("status") CommentStatus status, @NonNull IPage pageable);
 
 
     /**
@@ -45,6 +49,11 @@ public interface BaseCommentRepository<COMMENT extends BaseComment>
      */
     @NonNull
     @SensitiveConceal
+    @Select({"<script>","select * from comments where post_id in ",
+            "<foreach item='item' index='index' collection='items' open='(' separator=',' close=')'>",
+            "#{item}",
+            "</foreach>",
+            "</script>"})
     List<COMMENT> findAllByPostIdIn(@NonNull Collection<Integer> postIds);
 
     /**
@@ -55,7 +64,8 @@ public interface BaseCommentRepository<COMMENT extends BaseComment>
      */
     @NonNull
     @SensitiveConceal
-    List<COMMENT> findAllByPostId(@NonNull Serializable postId);
+    @Select("select * from comments where post_id = #{postId}")
+    List<COMMENT> findAllByPostId(@NonNull @Param("postId") Serializable postId);
 
     /**
      * Counts comment count by post id collection.
@@ -63,13 +73,14 @@ public interface BaseCommentRepository<COMMENT extends BaseComment>
      * @param postIds post id collection must not be null
      * @return a list of comment count
      */
-    @Select(
-            "select new com.tmser.blog.model.projection.CommentCountProjection(count(comment.id), "
-                    + "comment.postId) "
-                    + "from BaseComment comment "
-                    + "where comment.postId in ?1 "
-                    + "group by comment.postId")
     @NonNull
+    @Select({"<script>","select count(comment.id) count, comment.post_id postId " +
+                " from comments comment where comment.post_id in ",
+            "<foreach item='item' index='index' collection='items' open='(' separator=',' close=')'>",
+            "#{item}",
+            "</foreach>",
+            " group by comment.post_id",
+            "</script>"})
     List<CommentCountProjection> countByPostIds(@NonNull Collection<Integer> postIds);
 
     /**
@@ -79,15 +90,15 @@ public interface BaseCommentRepository<COMMENT extends BaseComment>
      * @param postIds post id collection must not be null
      * @return a list of comment count
      */
-    @Select(
-            "select new com.tmser.blog.model.projection.CommentCountProjection(count(comment.id), "
-                    + "comment.postId) "
-                    + "from BaseComment comment "
-                    + "where comment.status = ?1 "
-                    + "and comment.postId in ?2 "
-                    + "group by comment.postId")
     @NonNull
-    List<CommentCountProjection> countByStatusAndPostIds(@NonNull CommentStatus status,
+    @Select({"<script>","select count(comment.id) count, comment.post_id postId " +
+            " from comments comment where  comment.status = #{status} and comment.post_id in ",
+            "<foreach item='item' index='index' collection='items' open='(' separator=',' close=')'>",
+            "#{item}",
+            "</foreach>",
+            " group by comment.post_id",
+            "</script>"})
+    List<CommentCountProjection> countByStatusAndPostIds(@NonNull @Param("status") CommentStatus status,
                                                          @NonNull Collection<Integer> postIds);
 
 
@@ -97,7 +108,13 @@ public interface BaseCommentRepository<COMMENT extends BaseComment>
      * @param parentIds
      * @param sort
      */
-    List<COMMENT> findAllByIdIn(Collection<Long> parentIds, Sort sort);
+    @Select({"<script>","select * from comments where id in ",
+            "<foreach item='item' index='index' collection='items' open='(' separator=',' close=')'>",
+            "#{item}",
+            "</foreach>",
+            " order by #{sort}",
+            "</script>"})
+    List<COMMENT> findAllByIdIn(Collection<Long> parentIds, @Param("sort") Sort sort);
 
     /**
      * Count comments by post id.
@@ -105,7 +122,8 @@ public interface BaseCommentRepository<COMMENT extends BaseComment>
      * @param postId post id must not be null.
      * @return comments count
      */
-    long countByPostId(@NonNull Integer postId);
+    @Select("select count(*) from comments where post_id = #{postId}")
+    long countByPostId(@NonNull @Param("postId") Integer postId);
 
     /**
      * Count comments by comment status and post id.
@@ -114,7 +132,8 @@ public interface BaseCommentRepository<COMMENT extends BaseComment>
      * @param postId post id must not be null.
      * @return comments count
      */
-    long countByStatusAndPostId(@NonNull CommentStatus status, @NonNull Integer postId);
+    @Select("select count(*) from comments where status = #{status} and post_id = #{postId}")
+    long countByStatusAndPostId(@NonNull @Param("status") CommentStatus status, @NonNull @Param("postId") Integer postId);
 
     /**
      * Counts by comment status.
@@ -122,7 +141,8 @@ public interface BaseCommentRepository<COMMENT extends BaseComment>
      * @param status comment status must not be null
      * @return comment count
      */
-    long countByStatus(@NonNull CommentStatus status);
+    @Select("select count(*) from comments where status = #{status}")
+    long countByStatus(@NonNull @Param("status") CommentStatus status);
 
     /**
      * Removes comments by post id.
@@ -131,7 +151,8 @@ public interface BaseCommentRepository<COMMENT extends BaseComment>
      * @return a list of comment deleted
      */
     @NonNull
-    List<COMMENT> deleteByPostId(@NonNull Integer postId);
+    @Update("delete from comments where post_id = #{postId}")
+    List<COMMENT> deleteByPostId(@NonNull @Param("postId") Integer postId);
 
     /**
      * Removes comments by parent id.
@@ -140,7 +161,8 @@ public interface BaseCommentRepository<COMMENT extends BaseComment>
      * @return a list of comment deleted
      */
     @NonNull
-    List<COMMENT> deleteByParentId(@NonNull Long id);
+    @Update("delete from comments where parent_id = #{parentId}")
+    List<COMMENT> deleteByParentId(@NonNull @Param("parentId") Long id);
 
     /**
      * Finds comments by post id, comment status.
@@ -151,7 +173,8 @@ public interface BaseCommentRepository<COMMENT extends BaseComment>
      */
     @NonNull
     @SensitiveConceal
-    List<COMMENT> findAllByPostIdAndStatus(Integer postId, CommentStatus status);
+    @Select("select * from comments where status = #{status} and post_id = #{postId}")
+    List<COMMENT> findAllByPostIdAndStatus(@Param("postId") Integer postId, @Param("status") CommentStatus status);
 
     /**
      * Finds comments by post id and comment status.
@@ -163,7 +186,8 @@ public interface BaseCommentRepository<COMMENT extends BaseComment>
      */
     @NonNull
     @SensitiveConceal
-    IPage<COMMENT> findAllByPostIdAndStatus(Integer postId, CommentStatus status, IPage pageable);
+    @Select("select * from comments where status = #{status} and post_id = #{postId}")
+    IPage<COMMENT> findAllByPostIdAndStatus(@Param("postId") Integer postId, @Param("status") CommentStatus status, IPage pageable);
 
     /**
      * Finds comments by post id, comment status and parent id.
@@ -175,8 +199,10 @@ public interface BaseCommentRepository<COMMENT extends BaseComment>
      */
     @NonNull
     @SensitiveConceal
-    List<COMMENT> findAllByPostIdAndStatusAndParentId(@NonNull Integer postId,
-                                                      @NonNull CommentStatus status, @NonNull Long parentId);
+    @Select("select * from comments where status = #{status} and post_id = #{postId} and parent_id = #{parentId}")
+    List<COMMENT> findAllByPostIdAndStatusAndParentId(@NonNull @Param("postId") Integer postId,
+                                                      @NonNull @Param("status") CommentStatus status,
+                                                      @NonNull @Param("parentId") Long parentId);
 
     /**
      * Finds comments by post id, comment status and parent id.
@@ -189,8 +215,10 @@ public interface BaseCommentRepository<COMMENT extends BaseComment>
      */
     @NonNull
     @SensitiveConceal
-    IPage<COMMENT> findAllByPostIdAndStatusAndParentId(Integer postId, CommentStatus status,
-                                                       Long parentId, IPage pageable);
+    @Select("select * from comments where status = #{status} and post_id = #{postId} and parent_id = #{parentId}")
+    IPage<COMMENT> findAllByPostIdAndStatusAndParentId(@NonNull @Param("postId") Integer postId,
+                                                       @NonNull @Param("status") CommentStatus status,
+                                                       @NonNull @Param("parentId") Long parentId, IPage pageable);
 
     /**
      * Finds comments by post id and parent id.
@@ -201,7 +229,9 @@ public interface BaseCommentRepository<COMMENT extends BaseComment>
      */
     @NonNull
     @SensitiveConceal
-    List<COMMENT> findAllByPostIdAndParentId(@NonNull Integer postId, @NonNull Long parentId);
+    @Select("select * from comments where post_id = #{postId} and parent_id = #{parentId}")
+    List<COMMENT> findAllByPostIdAndParentId(@NonNull @Param("postId") Integer postId,
+                                             @NonNull @Param("parentId") Long parentId);
 
     /**
      * Finds all comments by status and parent id collection.
@@ -212,7 +242,12 @@ public interface BaseCommentRepository<COMMENT extends BaseComment>
      */
     @NonNull
     @SensitiveConceal
-    List<COMMENT> findAllByStatusAndParentIdIn(@NonNull CommentStatus status,
+    @Select({"<script>","select * from comments where status = #{status} and parent_id in ",
+            "<foreach item='item' index='index' collection='items' open='(' separator=',' close=')'>",
+            "#{item}",
+            "</foreach>",
+            "</script>"})
+    List<COMMENT> findAllByStatusAndParentIdIn(@NonNull @Param("status") CommentStatus status,
                                                @NonNull Collection<Long> parentIds);
 
     /**
@@ -222,6 +257,11 @@ public interface BaseCommentRepository<COMMENT extends BaseComment>
      * @return a list of comment
      */
     @SensitiveConceal
+    @Select({"<script>","select * from comments where parent_id in ",
+            "<foreach item='item' index='index' collection='items' open='(' separator=',' close=')'>",
+            "#{item}",
+            "</foreach>",
+            "</script>"})
     List<COMMENT> findAllByParentIdIn(@NonNull Collection<Long> parentIds);
 
 
@@ -232,14 +272,13 @@ public interface BaseCommentRepository<COMMENT extends BaseComment>
      * @param status     comment status must not be null.
      * @return a list of CommentChildrenCountProjection
      */
-    @Select(
-            "select new com.tmser.blog.model.projection.CommentChildrenCountProjection(count(comment"
-                    + ".id), comment.parentId) "
-                    + "from BaseComment comment "
-                    + "where comment.parentId in ?1 "
-                    + "and comment.status = ?2 "
-                    + "group by comment.parentId")
     @NonNull
+    @Select({"<script>","select count(id) directChildrenCount, parent_id commentId from comments where status = #{status} and parent_id in ",
+            "<foreach item='item' index='index' collection='items' open='(' separator=',' close=')'>",
+            "#{item}",
+            "</foreach>",
+            " group by parent_id",
+            "</script>"})
     List<CommentChildrenCountProjection> findDirectChildrenCount(
-            @NonNull Collection<Long> commentIds, @NonNull CommentStatus status);
+            @NonNull Collection<Long> commentIds, @NonNull @Param("status") CommentStatus status);
 }

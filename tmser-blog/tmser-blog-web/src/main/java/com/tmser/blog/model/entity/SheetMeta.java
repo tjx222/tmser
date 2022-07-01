@@ -1,5 +1,6 @@
 package com.tmser.blog.model.entity;
 
+import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import lombok.EqualsAndHashCode;
@@ -15,4 +16,11 @@ import lombok.EqualsAndHashCode;
 @DiscriminatorValue("1")
 @EqualsAndHashCode(callSuper = true)
 public class SheetMeta extends BaseMeta {
+
+    /**
+     * type
+     */
+    @Column(name = "type", nullable = false)
+    private Integer type = 1;
+
 }

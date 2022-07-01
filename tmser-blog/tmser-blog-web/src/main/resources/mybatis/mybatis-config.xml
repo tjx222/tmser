@@ -12,6 +12,9 @@
         <typeHandler handler="com.tmser.database.mybatis.ArrayTypeHandler" javaType="[Ljava.lang.String;"/>
         <typeHandler handler="com.tmser.database.mybatis.ArrayTypeHandler" javaType="[Ljava.lang.Integer;"/>
         <typeHandler handler="com.tmser.database.mybatis.ArrayTypeHandler" javaType="[Ljava.lang.Integer;"/>
+        <typeHandler handler="org.apache.ibatis.type.EnumOrdinalTypeHandler" javaType="com.tmser.blog.model.enums.CommentStatus" />
+        <typeHandler handler="org.apache.ibatis.type.EnumOrdinalTypeHandler" javaType="com.tmser.blog.model.enums.AttachmentType" />
+        <typeHandler handler="org.apache.ibatis.type.EnumOrdinalTypeHandler" javaType="com.tmser.blog.model.enums.PostStatus" />
         <typeHandler handler="org.apache.ibatis.type.LocalDateTimeTypeHandler" />
         <typeHandler handler="org.apache.ibatis.type.LocalDateTypeHandler" />
         <typeHandler handler="org.apache.ibatis.type.LocalTimeTypeHandler" />

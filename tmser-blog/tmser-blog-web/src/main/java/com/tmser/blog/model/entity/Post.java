@@ -1,5 +1,7 @@
 package com.tmser.blog.model.entity;
 
+import lombok.Data;
+
 import javax.persistence.*;
 
 /**
@@ -14,6 +16,7 @@ import javax.persistence.*;
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.INTEGER,
         columnDefinition = "int default 0")
 @DiscriminatorValue(value = "0")
+@Data
 public class Post extends BasePost {
-
+    private Integer type = 0;
 }
