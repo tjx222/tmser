@@ -42,7 +42,7 @@ public class JournalModel {
                         Integer.parseInt(SheetProperties.JOURNALS_PAGE_SIZE.defaultValue()));
 
         PageImpl pageable =
-                PageImpl.of(page >= 1 ? page - 1 : page, pageSize, Sort.by(DESC, "createTime"));
+                PageImpl.of(page >= 1 ? page - 1 : page, pageSize, Sort.by(DESC, "create_time"));
 
         Page<Journal> journals = journalService.pageBy(JournalType.PUBLIC, pageable);
 

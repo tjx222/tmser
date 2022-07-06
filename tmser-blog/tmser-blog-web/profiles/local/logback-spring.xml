@@ -41,7 +41,12 @@
     <logger name="org.springframework" level="INFO" additivity="false">
         <appender-ref ref="stdout"/>
     </logger>
+
     <logger name="com.mysql.jdbc" level="INFO" additivity="false">
+        <appender-ref ref="stdout"/>
+    </logger>
+
+    <logger name="com.tmser.blog.repository" level="DEBUG" additivity="false">
         <appender-ref ref="stdout"/>
     </logger>
 

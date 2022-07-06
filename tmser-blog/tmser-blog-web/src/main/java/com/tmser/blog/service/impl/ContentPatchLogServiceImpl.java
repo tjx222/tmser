@@ -226,8 +226,7 @@ public class ContentPatchLogServiceImpl implements ContentPatchLogService {
     @Override
     public ContentPatchLog getById(Integer id) {
         return Optional.ofNullable(contentPatchLogRepository.selectById(id))
-            .orElseThrow(() -> new NotFoundException(
-                "Post content patch log was not found or has been deleted."));
+            .orElseGet(() -> new ContentPatchLog());
     }
 
     @Override

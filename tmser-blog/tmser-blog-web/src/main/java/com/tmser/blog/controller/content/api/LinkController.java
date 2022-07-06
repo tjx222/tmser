@@ -29,7 +29,7 @@ public class LinkController {
     }
 
     @GetMapping
-    public List<LinkDTO> listLinks(@SortDefault(sort = "createTime, DESC") Sort sort) {
+    public List<LinkDTO> listLinks(@SortDefault(sort = "create_time, DESC") Sort sort) {
         return linkService.listDtos(sort);
     }
 

@@ -1,8 +1,8 @@
 server:
-  port: 30040
+  port: 8090
   max-http-header-size: 184320
   servlet:
-    context-path: /sample
+    context-path: /
 
 nacos:
   config:
@@ -49,3 +49,5 @@ spring:
           password: 123456
 
 config.sensitive.aes_key: qwertyuioplkjhgf
+halo:
+  workDir: E:\\third-git\\tmser\\tmser-blog\\tmser-blog-web\\target\\classes\\

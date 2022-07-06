@@ -42,12 +42,12 @@ public class PhotoTagDirective implements TemplateDirectiveModel {
                     break;
                 case "listTeams":
                     env.setVariable("teams", builder.build()
-                            .wrap(photoService.listTeamVos(Sort.by(DESC, "createTime"))));
+                            .wrap(photoService.listTeamVos(Sort.by(DESC, "create_time"))));
                     break;
                 case "listByTeam":
                     String team = params.get("team").toString();
                     env.setVariable("photos", builder.build()
-                            .wrap(photoService.listByTeam(team, Sort.by(DESC, "createTime"))));
+                            .wrap(photoService.listByTeam(team, Sort.by(DESC, "create_time"))));
                     break;
                 case "count":
                     env.setVariable("count", builder.build().wrap(photoService.count()));

@@ -43,7 +43,7 @@ public class PostCommentController {
 
     @GetMapping
     public Page<PostCommentWithPostVO> pageBy(
-            @PageableDefault(sort = "createTime,DESC") PageImpl pageable,
+            @PageableDefault(sort = "create_time,DESC") PageImpl pageable,
             CommentQuery commentQuery) {
         Page<PostComment> commentPage = postCommentService.pageBy(commentQuery, pageable);
         return postCommentService.convertToWithPostVo(commentPage);
@@ -63,7 +63,7 @@ public class PostCommentController {
     @GetMapping("{postId:\\d+}/tree_view")
     public Page<BaseCommentVO> listCommentTree(@PathVariable("postId") Integer postId,
                                                @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-                                               @SortDefault(sort = "createTime,DESC") Sort sort) {
+                                               @SortDefault(sort = "create_time,DESC") Sort sort) {
         return postCommentService
                 .pageVosAllBy(postId, PageImpl.of(page, optionService.getCommentPageSize(), sort));
     }
@@ -71,7 +71,7 @@ public class PostCommentController {
     @GetMapping("{postId:\\d+}/list_view")
     public Page<BaseCommentWithParentVO> listComments(@PathVariable("postId") Integer postId,
                                                       @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-                                                      @SortDefault(sort = "createTime, DESC") Sort sort) {
+                                                      @SortDefault(sort = "create_time, DESC") Sort sort) {
         return postCommentService.pageWithParentVoBy(postId,
                 PageImpl.of(page, optionService.getCommentPageSize(), sort));
     }

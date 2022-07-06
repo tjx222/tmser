@@ -27,7 +27,7 @@ public interface BaseMetaRepository<M extends BaseMeta>
      * @param postId post id must not be null
      * @return a list of post meta deleted
      */
-    Long deleteByPostId(@NonNull Integer postId);
+    void deleteByPostId(@NonNull Integer postId);
 
     /**
      * Finds all post metas by post id.

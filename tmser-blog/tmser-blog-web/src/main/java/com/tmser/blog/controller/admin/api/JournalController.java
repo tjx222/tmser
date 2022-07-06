@@ -33,7 +33,7 @@ public class JournalController {
 
     @GetMapping
     public Page<JournalWithCmtCountDTO> pageBy(
-            @PageableDefault(sort = "createTime,DESC") PageImpl pageable,
+            @PageableDefault(sort = "create_time,DESC") PageImpl pageable,
             JournalQuery journalQuery) {
         Page<Journal> journalPage = journalService.pageBy(journalQuery, pageable);
         return journalService.convertToCmtCountDto(journalPage);

@@ -1,5 +1,6 @@
 package com.tmser.blog.model.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.tmser.blog.model.entity.Content.PatchedContent;
 import com.tmser.blog.model.enums.PostEditorType;
 import com.tmser.blog.model.enums.PostStatus;
@@ -24,6 +25,8 @@ import java.util.Date;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class BasePost extends BaseEntity {
+    public static final int T_POST = 0;
+    public static final int T_SHEET = 0;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "custom-id")
@@ -158,10 +161,11 @@ public class BasePost extends BaseEntity {
      * don't want to save this value.
      */
     @Transient
+    @TableField(exist = false)
     private PatchedContent content;
 
     @Override
-    public void prePersist() {
+    protected void prePersist() {
         super.prePersist();
 
         if (editTime == null) {

@@ -240,7 +240,7 @@ public abstract class AbstractCrudService<DOMAIN, I extends Serializable> implem
     @Override
     public DOMAIN update(DOMAIN domain) {
         Assert.notNull(domain, domainName + " data must not be null");
-        repository.update(domain, null);
+        repository.updateById(domain);
         return domain;
     }
 

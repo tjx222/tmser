@@ -1,6 +1,7 @@
 package com.tmser.blog.model.entity;
 
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.*;
 
@@ -16,11 +17,12 @@ import javax.persistence.*;
         @Index(name = "posts_create_time", columnList = "create_time")})
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.INTEGER,
         columnDefinition = "int default 0")
-@DiscriminatorValue("1")
+@DiscriminatorValue(BasePost.T_SHEET+"")
 @Data
+@ToString(callSuper = true)
 public class Sheet extends BasePost {
 
     @Column(name = "type", nullable = false)
-    private Integer type = 1;
+    private Integer type = BasePost.T_SHEET;
 
 }

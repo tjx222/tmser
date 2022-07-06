@@ -41,7 +41,7 @@ public class PhotoModel {
                 Integer.parseInt(SheetProperties.PHOTOS_PAGE_SIZE.defaultValue()));
 
         Page pageable =
-                PageImpl.of(page >= 1 ? page - 1 : page, pageSize, Sort.by(DESC, "createTime"));
+                PageImpl.of(page >= 1 ? page - 1 : page, pageSize, Sort.by(DESC, "create_time"));
 
         Page<PhotoDTO> photos = photoService.pageBy(pageable);
 

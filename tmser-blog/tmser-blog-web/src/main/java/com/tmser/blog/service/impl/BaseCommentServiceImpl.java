@@ -103,33 +103,6 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
                 baseCommentRepository.findAllByStatus(status, MybatisPageHelper.changeToMybatisPage(pageable)), pageable);
     }
 
-    @Override
-    @NonNull
-    public Page<COMMENT> pageBy(@NonNull CommentStatus status, @NonNull Page page) {
-
-        Assert.notNull(status, "Comment status must not be null");
-        Assert.notNull(page, "Page info must not be null");
-
-        // Find all
-        return MybatisPageHelper.fillPageData(baseCommentRepository.findAllByStatus(status, MybatisPageHelper.changeToMybatisPage(page)), page);
-    }
-
-    @Override
-    @NonNull
-    public Page<COMMENT> pageBy(@NonNull CommentQuery commentQuery, @NonNull Page page) {
-        Assert.notNull(page, "Page info must not be null");
-        QueryWrapper<COMMENT> qm = new QueryWrapper<>();
-        if (commentQuery.getStatus() != null) {
-            qm.eq("status", commentQuery.getStatus());
-        }
-
-        if (commentQuery.getKeyword() != null) {
-            String kw = StringUtils.strip(commentQuery.getKeyword());
-            qm.or(w -> w.like("author", kw).like("content", kw).like("email", kw));
-        }
-
-        return MybatisPageHelper.fillPageData(baseCommentRepository.selectPage(MybatisPageHelper.changeToMybatisPage(page), qm), page);
-    }
 
     @Override
     @NonNull
@@ -152,7 +125,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
         Assert.notNull(page, "Page info must not be null");
 
         Comparator<BaseCommentVO> commentComparator =
-                buildCommentComparator(sort != null ? sort : Sort.by(DESC, "createTime"));
+                buildCommentComparator(sort != null ? sort : Sort.by(DESC, "create_time"));
 
         // Convert to vo
         List<BaseCommentVO> topComments = convertToVo(comments, commentComparator);
@@ -218,7 +191,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
 
         // List all the top comments (Caution: This list will be cleared)
         Page<COMMENT> commentPage = MybatisPageHelper.fillPageData(baseCommentRepository
-                .findAllByPostIdAndStatus(postId, CommentStatus.PUBLISHED, MybatisPageHelper.changeToMybatisPage(page)), page);
+                .findPageByPostIdAndStatus(postId, CommentStatus.PUBLISHED, MybatisPageHelper.changeToMybatisPage(page)), page);
 
         // Get all comments
         List<COMMENT> comments = commentPage.getContent();
@@ -446,7 +419,9 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
     @Override
     public List<COMMENT> removeByPostId(@NonNull Integer postId) {
         Assert.notNull(postId, "Post id must not be null");
-        return baseCommentRepository.deleteByPostId(postId);
+        List<COMMENT> allByPostId = baseCommentRepository.findAllByPostId(postId);
+        baseCommentRepository.deleteByPostId(postId);
+        return allByPostId;
     }
 
     @Override
@@ -458,7 +433,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
                 .orElseThrow(() -> new NotFoundException("查询不到该评论的信息").setErrorData(id));
 
         List<COMMENT> children =
-                listChildrenBy(comment.getPostId(), id, Sort.by(DESC, "createTime"));
+                listChildrenBy(comment.getPostId(), id, Sort.by(DESC, "create_time"));
 
         if (children.size() > 0) {
             children.forEach(child -> {
@@ -566,7 +541,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
 
         // Get all comments
         Page<COMMENT> topCommentPage = MybatisPageHelper.fillPageData(baseCommentRepository
-                .findAllByPostIdAndStatusAndParentId(targetId, status, 0L,
+                .findPageByPostIdAndStatusAndParentId(targetId, status, 0L,
                         MybatisPageHelper.changeToMybatisPage(page)), page);
 
         if (topCommentPage.getTotal() == 0) {

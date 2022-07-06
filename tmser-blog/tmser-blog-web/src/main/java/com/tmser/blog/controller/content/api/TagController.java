@@ -44,7 +44,7 @@ public class TagController {
 
     @GetMapping
     public List<? extends TagDTO> listTags(
-            @SortDefault(sort = "updateTime, DESC") Sort sort,
+            @SortDefault(sort = "update_time, DESC") Sort sort,
             @RequestParam(name = "more", required = false, defaultValue = "false") Boolean more) {
         if (more) {
             return postTagService.listTagWithCountDtos(sort);
@@ -54,7 +54,7 @@ public class TagController {
 
     @GetMapping("{slug}/posts")
     public Page<PostListVO> listPostsBy(@PathVariable("slug") String slug,
-                                        @PageableDefault(sort = {"topPriority,DESC", "updateTime,DESC"})
+                                        @PageableDefault(sort = {"top_priority,DESC", "update_time,DESC"})
                                                 PageImpl pageable) {
         // Get tag by slug
         Tag tag = tagService.getBySlugOfNonNull(slug);

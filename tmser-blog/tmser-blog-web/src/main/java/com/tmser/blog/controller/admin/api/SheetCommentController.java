@@ -43,7 +43,7 @@ public class SheetCommentController {
 
     @GetMapping
     public Page<SheetCommentWithSheetVO> pageBy(
-            @PageableDefault(sort = "createTime,desc") PageImpl pageable,
+            @PageableDefault(sort = "create_time,desc") PageImpl pageable,
             CommentQuery commentQuery) {
         Page<SheetComment> sheetCommentPage = sheetCommentService.pageBy(commentQuery, pageable);
         return sheetCommentService.convertToWithSheetVo(sheetCommentPage);
@@ -60,7 +60,7 @@ public class SheetCommentController {
     @GetMapping("{sheetId:\\d+}/tree_view")
     public Page<BaseCommentVO> listCommentTree(@PathVariable("sheetId") Integer sheetId,
                                                @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-                                               @SortDefault(sort = "createTime,DESC") Sort sort) {
+                                               @SortDefault(sort = "create_time,DESC") Sort sort) {
         return sheetCommentService
                 .pageVosAllBy(sheetId, PageImpl.of(page, optionService.getCommentPageSize(), sort));
     }
@@ -68,7 +68,7 @@ public class SheetCommentController {
     @GetMapping("{sheetId:\\d+}/list_view")
     public Page<BaseCommentWithParentVO> listComments(@PathVariable("sheetId") Integer sheetId,
                                                       @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-                                                      @SortDefault(sort = "createTime, DESC") Sort sort) {
+                                                      @SortDefault(sort = "create_time, DESC") Sort sort) {
         return sheetCommentService.pageWithParentVoBy(sheetId,
                 PageImpl.of(page, optionService.getCommentPageSize(), sort));
     }

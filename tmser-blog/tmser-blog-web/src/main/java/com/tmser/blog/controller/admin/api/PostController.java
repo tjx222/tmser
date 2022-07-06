@@ -55,7 +55,7 @@ public class PostController {
 
     @GetMapping
     public Page<? extends BasePostSimpleDTO> pageBy(
-            @PageableDefault(sort = {"topPriority,DESC", "createTime,DESC"}) PageImpl pageable,
+            @PageableDefault(sort = {"top_priority,DESC", "create_time,DESC"}) PageImpl pageable,
             PostQuery postQuery,
             @RequestParam(value = "more", defaultValue = "true") Boolean more) {
         Page<Post> postPage = postService.pageBy(postQuery, pageable);
@@ -76,7 +76,7 @@ public class PostController {
     public Page<? extends BasePostSimpleDTO> pageByStatus(
             @PathVariable(name = "status") PostStatus status,
             @RequestParam(value = "more", required = false, defaultValue = "false") Boolean more,
-            @PageableDefault(sort = "createTime, DESC") PageImpl pageable) {
+            @PageableDefault(sort = "create_time, DESC") PageImpl pageable) {
         Page<Post> posts = postService.pageBy(status, pageable);
 
         if (more) {

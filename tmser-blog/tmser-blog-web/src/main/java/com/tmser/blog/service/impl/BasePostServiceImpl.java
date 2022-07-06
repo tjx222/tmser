@@ -144,15 +144,14 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
         String indexSort =
                 optionService.getByPropertyOfNonNull(PostProperties.INDEX_SORT).toString();
 
-        //TODO 分页条件添加
-        Page<POST> pageRequest = PageImpl.of(0, size);//, Sort.by(ASC, indexSort));
+        Page<POST> pageRequest = PageImpl.of(0, size, Sort.by(Sort.Direction.ASC, indexSort));
 
         switch (indexSort) {
-            case "createTime":
+            case "create_time":
                 return MybatisPageHelper.fillPageData(basePostRepository
                         .findAllByStatusAndCreateTimeAfter(PostStatus.PUBLISHED, post.getCreateTime(),
                                 MybatisPageHelper.changeToMybatisPage(pageRequest)), pageRequest).getContent();
-            case "editTime":
+            case "edit_time":
                 return MybatisPageHelper.fillPageData(basePostRepository
                         .findAllByStatusAndEditTimeAfter(PostStatus.PUBLISHED, post.getEditTime(),
                                 MybatisPageHelper.changeToMybatisPage(pageRequest)), pageRequest).getContent();
@@ -172,14 +171,14 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
         String indexSort =
                 optionService.getByPropertyOfNonNull(PostProperties.INDEX_SORT).toString();
 
-        Page<POST> pageRequest = PageImpl.of(0, size);//, Sort.by(DESC, indexSort));
+        Page<POST> pageRequest = PageImpl.of(0, size, Sort.by(DESC, indexSort));
 
         switch (indexSort) {
-            case "createTime":
+            case "create_time":
                 return MybatisPageHelper.fillPageData(basePostRepository
                         .findAllByStatusAndCreateTimeBefore(PostStatus.PUBLISHED, post.getCreateTime(),
                                 MybatisPageHelper.changeToMybatisPage(pageRequest)), pageRequest).getContent();
-            case "editTime":
+            case "edit_time":
                 return MybatisPageHelper.fillPageData(basePostRepository
                         .findAllByStatusAndEditTimeBefore(PostStatus.PUBLISHED, post.getEditTime(),
                                 MybatisPageHelper.changeToMybatisPage(pageRequest)), pageRequest).getContent();
@@ -210,7 +209,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
     public Page<POST> pageLatest(int top) {
         Assert.isTrue(top > 0, "Top number must not be less than 0");
 
-        Page latestPageable = PageImpl.of(0, top); //, Sort.by(DESC, "createTime"));
+        Page latestPageable = PageImpl.of(0, top, Sort.by(DESC, "create_time"));
 
         return listAll(latestPageable);
     }
@@ -225,9 +224,9 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
     public List<POST> listLatest(int top) {
         Assert.isTrue(top > 0, "Top number must not be less than 0");
 
-        Page<POST> latestPageable = PageImpl.of(0, top, Sort.by(DESC, "createTime"));
+        Page<POST> latestPageable = PageImpl.of(0, top, Sort.by(DESC, "create_time"));
         return MybatisPageHelper.fillPageData(
-                        basePostRepository.findAllByStatus(PostStatus.PUBLISHED,
+                        basePostRepository.findPageByStatus(PostStatus.PUBLISHED,
                                 MybatisPageHelper.changeToMybatisPage(latestPageable)), latestPageable)
                 .getContent();
     }
@@ -246,7 +245,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
         Assert.notNull(pageable, "Page info must not be null");
 
         return MybatisPageHelper.fillPageData(
-                basePostRepository.findAllByStatus(status, MybatisPageHelper.changeToMybatisPage(pageable)), pageable);
+                basePostRepository.findPageByStatus(status, MybatisPageHelper.changeToMybatisPage(pageable)), pageable);
     }
 
     @Override

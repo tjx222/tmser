@@ -173,7 +173,7 @@ public class PostModel {
     public String archives(Integer page, Model model) {
         int pageSize = optionService.getArchivesPageSize();
         PageImpl pageable = PageImpl
-                .of(page >= 1 ? page - 1 : page, pageSize, Sort.by(Sort.Direction.DESC, "createTime"));
+                .of(page >= 1 ? page - 1 : page, pageSize, Sort.by(Sort.Direction.DESC, "create_time"));
 
         Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
 

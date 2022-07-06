@@ -59,16 +59,6 @@ public interface BaseCommentService<COMMENT extends BaseComment>
     /**
      * Pages comments.
      *
-     * @param status   comment status must not be null
-     * @param pageable page info must not be null
-     * @return a page of comment
-     */
-    @NonNull
-    Page<COMMENT> pageBy(@NonNull CommentStatus status, @NonNull Page pageable);
-
-    /**
-     * Pages comments.
-     *
      * @param commentQuery comment query must not be null
      * @param pageable     page info must not be null
      * @return a page of comment

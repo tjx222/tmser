@@ -22,12 +22,13 @@ import lombok.ToString;
  */
 @Data
 @Entity(name = "BaseMeta")
-@Table(name = "metas")
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.INTEGER,
     columnDefinition = "int default 0")
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class BaseMeta extends BaseEntity {
+    public static final int MT_POST = 0;
+    public static final int MT_SHEET = 1;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "custom-id")

@@ -52,7 +52,7 @@ public class ContentSearchController {
     @GetMapping
     public String search(Model model,
                          @RequestParam(value = "keyword") String keyword) {
-        return this.search(model, HtmlUtils.htmlEscape(keyword), 1, Sort.by(DESC, "createTime"));
+        return this.search(model, HtmlUtils.htmlEscape(keyword), 1, Sort.by(DESC, "create_time"));
     }
 
     /**
@@ -66,7 +66,7 @@ public class ContentSearchController {
     public String search(Model model,
                          @RequestParam(value = "keyword") String keyword,
                          @PathVariable(value = "page") Integer page,
-                         @SortDefault(sort = "createTime,desc") Sort sort) {
+                         @SortDefault(sort = "create_time,desc") Sort sort) {
         final Page pageable = PageImpl.of(page - 1, optionService.getPostPageSize(), sort);
         final Page<Post> postPage = postService.pageBy(keyword, pageable);
 

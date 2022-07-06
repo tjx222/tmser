@@ -54,7 +54,7 @@ public class TagModel {
         final Tag tag = tagService.getBySlugOfNonNull(slug);
         TagDTO tagDTO = tagService.convertTo(tag);
 
-        final Page pageable = PageImpl.of(page - 1, optionService.getArchivesPageSize(), Sort.by(DESC, "createTime"));
+        final Page pageable = PageImpl.of(page - 1, optionService.getArchivesPageSize(), Sort.by(DESC, "create_time"));
         Page<Post> postPage =
                 postTagService.pagePostsBy(tag.getId(), PostStatus.PUBLISHED, pageable);
         Page<PostListVO> posts = postService.convertToListVo(postPage);

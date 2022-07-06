@@ -24,9 +24,9 @@ public interface LinkRepository extends BaseRepository<Link> {
     @Select(value = "select distinct a.team from links a")
     List<String> findAllTeams();
 
-    @Select(value = "select 1  from links where name = #{name} and id <> #{id} limit 1")
+    @Select(value = "select count(*)  from links where name = #{name} and id <> #{id} limit 1")
     boolean existsByNameAndIdNot(@Param("name") String name, @Param("id") Integer id);
 
-    @Select(value = "select 1  from links where url = #{url} and id <> #{id} limit 1")
+    @Select(value = "select count(*)  from links where url = #{url} and id <> #{id} limit 1")
     boolean existsByUrlAndIdNot(@Param("url") String url, @Param("id") Integer id);
 }

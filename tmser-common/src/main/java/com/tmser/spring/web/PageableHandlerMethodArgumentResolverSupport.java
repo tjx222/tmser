@@ -261,7 +261,6 @@ public class PageableHandlerMethodArgumentResolverSupport {
             }
 
             SortHandlerMethodArgumentResolverSupport.SortOrderParser.parse(part, delimiter) //
-                    .parseIgnoreCase() //
                     .parseDirection() //
                     .forEachOrder(allOrders::add);
         }

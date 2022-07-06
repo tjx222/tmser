@@ -33,7 +33,7 @@ import com.tmser.blog.utils.ServiceUtils;
 public abstract class BaseMetaServiceImpl<META extends BaseMeta>
     extends AbstractCrudService<META,Integer> implements BaseMetaService<META> {
 
-    private final BaseMetaRepository<META> baseMetaRepository;
+    protected final BaseMetaRepository<META> baseMetaRepository;
 
 
     public BaseMetaServiceImpl(BaseMetaRepository<META> baseMetaRepository) {

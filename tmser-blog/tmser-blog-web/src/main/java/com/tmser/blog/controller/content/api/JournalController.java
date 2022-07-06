@@ -53,7 +53,7 @@ public class JournalController {
 
     @GetMapping
     public Page<JournalWithCmtCountDTO> pageBy(
-            @PageableDefault(sort = "createTime,DESC") PageImpl pageable) {
+            @PageableDefault(sort = "create_time,DESC") PageImpl pageable) {
         Page<Journal> journals = journalService.pageBy(JournalType.PUBLIC, pageable);
         return journalService.convertToCmtCountDto(journals);
     }
@@ -68,7 +68,7 @@ public class JournalController {
     public Page<CommentWithHasChildrenVO> listTopComments(
             @PathVariable("journalId") Integer journalId,
             @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-            @SortDefault(sort = "createTime, DESC") Sort sort) {
+            @SortDefault(sort = "create_time, DESC") Sort sort) {
         return journalCommentService.pageTopCommentsBy(journalId, CommentStatus.PUBLISHED,
                 PageImpl.of(page, optionService.getCommentPageSize(), sort));
     }
@@ -76,7 +76,7 @@ public class JournalController {
     @GetMapping("{journalId:\\d+}/comments/{commentParentId:\\d+}/children")
     public List<BaseCommentDTO> listChildrenBy(@PathVariable("journalId") Integer journalId,
                                                @PathVariable("commentParentId") Long commentParentId,
-                                               @SortDefault(sort = "createTime, DESC") Sort sort) {
+                                               @SortDefault(sort = "create_time, DESC") Sort sort) {
         // Find all children comments
         List<JournalComment> postComments = journalCommentService
                 .listChildrenBy(journalId, commentParentId, CommentStatus.PUBLISHED, sort);
@@ -87,7 +87,7 @@ public class JournalController {
     @GetMapping("{journalId:\\d+}/comments/tree_view")
     public Page<BaseCommentVO> listCommentsTree(@PathVariable("journalId") Integer journalId,
                                                 @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-                                                @SortDefault(sort = "createTime,DESC") Sort sort) {
+                                                @SortDefault(sort = "create_time,DESC") Sort sort) {
         return journalCommentService
                 .pageVosBy(journalId, PageImpl.of(page, optionService.getCommentPageSize(), sort));
     }
@@ -95,7 +95,7 @@ public class JournalController {
     @GetMapping("{journalId:\\d+}/comments/list_view")
     public Page<BaseCommentWithParentVO> listComments(@PathVariable("journalId") Integer journalId,
                                                       @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-                                                      @SortDefault(sort = "createTime,DESC") Sort sort) {
+                                                      @SortDefault(sort = "create_time,DESC") Sort sort) {
         return journalCommentService.pageWithParentVoBy(journalId,
                 PageImpl.of(page, optionService.getCommentPageSize(), sort));
     }

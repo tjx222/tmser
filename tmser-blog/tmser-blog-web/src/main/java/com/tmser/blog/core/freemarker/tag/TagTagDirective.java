@@ -47,7 +47,7 @@ public class TagTagDirective implements TemplateDirectiveModel {
             switch (method) {
                 case "list":
                     env.setVariable("tags", builder.build()
-                            .wrap(postTagService.listTagWithCountDtos(Sort.by(DESC, "createTime"))));
+                            .wrap(postTagService.listTagWithCountDtos(Sort.by(DESC, "create_time"))));
                     break;
                 case "listByPostId":
                     Integer postId = Integer.parseInt(params.get("postId").toString());

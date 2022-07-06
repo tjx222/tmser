@@ -1,16 +1,14 @@
 package com.tmser.blog.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.tmser.blog.event.logger.LogEvent;
 import com.tmser.blog.event.post.SheetVisitEvent;
 import com.tmser.blog.exception.AlreadyExistsException;
 import com.tmser.blog.exception.NotFoundException;
 import com.tmser.blog.model.dto.IndependentSheetDTO;
 import com.tmser.blog.model.dto.post.BasePostMinimalDTO;
-import com.tmser.blog.model.entity.Content;
+import com.tmser.blog.model.entity.*;
 import com.tmser.blog.model.entity.Content.PatchedContent;
-import com.tmser.blog.model.entity.Sheet;
-import com.tmser.blog.model.entity.SheetComment;
-import com.tmser.blog.model.entity.SheetMeta;
 import com.tmser.blog.model.enums.CommentStatus;
 import com.tmser.blog.model.enums.LogType;
 import com.tmser.blog.model.enums.PostStatus;
@@ -21,8 +19,11 @@ import com.tmser.blog.repository.SheetRepository;
 import com.tmser.blog.service.*;
 import com.tmser.blog.utils.MarkdownUtils;
 import com.tmser.blog.utils.ServiceUtils;
+import com.tmser.database.mybatis.MybatisPageHelper;
 import com.tmser.model.page.Page;
 import com.tmser.model.page.PageImpl;
+import com.tmser.model.page.Pageable;
+import com.tmser.model.sort.Sort;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.lang.NonNull;
@@ -172,6 +173,48 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet>
         sheet.setContent(patchedContent);
         return sheet;
     }
+    /**
+     * List All
+     *
+     * @return List
+     */
+    @Override
+    public List<Sheet> listAll() {
+        return sheetRepository.selectList(new QueryWrapper<Sheet>().eq(true,"type", Post.T_SHEET));
+    }
+
+    /**
+     * List all by sort
+     *
+     * @param sort sort
+     * @return List
+     */
+    @Override
+    public List<Sheet> listAll(Sort sort) {
+        Assert.notNull(sort, "Sort info must not be null");
+        final QueryWrapper<Sheet> domainQueryWrapper = new QueryWrapper<>();
+        domainQueryWrapper.eq("type", Post.T_SHEET);
+        sort.stream().forEach(orderItem -> {
+            domainQueryWrapper.orderBy(true, orderItem.getDirection() == Sort.Direction.ASC, orderItem.getProperty());
+        });
+        return sheetRepository.selectList(domainQueryWrapper);
+    }
+
+    /**
+     * List all by pageable
+     *
+     * @param pageable pageable
+     * @return Page
+     */
+    @Override
+    public Page<Sheet> listAll(Pageable pageable) {
+        Assert.notNull(pageable, "Pageable info must not be null");
+
+        return MybatisPageHelper.fillPageData(
+                sheetRepository.selectPage(MybatisPageHelper.changeToMybatisPage(pageable),
+                        new QueryWrapper<Sheet>().eq(true,"type", Post.T_SHEET)), pageable);
+    }
+
 
     @Override
     public Sheet getBy(PostStatus status, String slug) {

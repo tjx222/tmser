@@ -85,7 +85,7 @@ public class MybatisConfig {
     }
 
     /**
-     * 乐观锁
+     * 自动填充
      *
      * @return
      */

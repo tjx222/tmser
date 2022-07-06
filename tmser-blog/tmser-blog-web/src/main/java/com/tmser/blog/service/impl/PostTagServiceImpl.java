@@ -64,7 +64,7 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer>
         // Find all tag ids
         Set<Integer> tagIds = postTagRepository.findAllTagIdsByPostId(postId);
 
-        return tagRepository.selectBatchIds(tagIds);
+        return tagIds.isEmpty() ? Collections.emptyList() : tagRepository.selectBatchIds(tagIds);
     }
 
     @Override
@@ -119,7 +119,7 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer>
         Set<Integer> tagIds = ServiceUtils.fetchProperty(postTags, PostTag::getTagId);
 
         // Find all tags
-        List<Tag> tags = tagRepository.selectBatchIds(tagIds);
+        List<Tag> tags = tagIds.isEmpty() ? Collections.emptyList() : tagRepository.selectBatchIds(tagIds);
 
         // Convert to tag map
         Map<Integer, Tag> tagMap = ServiceUtils.convertToMap(tags, Tag::getId);
@@ -143,7 +143,7 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer>
         // Find all post ids
         Set<Integer> postIds = postTagRepository.findAllPostIdsByTagId(tagId);
 
-        return postRepository.selectBatchIds(postIds);
+        return postIds.isEmpty() ? Collections.emptyList() : postRepository.selectBatchIds(postIds);
     }
 
     @Override
@@ -152,9 +152,9 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer>
         Assert.notNull(status, "Post status must not be null");
 
         // Find all post ids
-        Set<Integer> postIds = postTagRepository.findAllPostIdsByTagId(tagId, status);
+        Set<Integer> postIds = postTagRepository.findAllPostIdsByTagIdAndStatus(tagId, status);
 
-        return postRepository.selectBatchIds(postIds);
+        return postIds.isEmpty() ? Collections.emptyList() : postRepository.selectBatchIds(postIds);
     }
 
     @Override
@@ -165,9 +165,9 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer>
         Tag tag = tagRepository.getBySlug(slug)
                 .orElseThrow(() -> new NotFoundException("查询不到该标签的信息").setErrorData(slug));
 
-        Set<Integer> postIds = postTagRepository.findAllPostIdsByTagId(tag.getId(), status);
+        Set<Integer> postIds = postTagRepository.findAllPostIdsByTagIdAndStatus(tag.getId(), status);
 
-        return postRepository.selectBatchIds(postIds);
+        return postIds.isEmpty() ? Collections.emptyList() : postRepository.selectBatchIds(postIds);
     }
 
     @Override
@@ -188,7 +188,7 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer>
         Assert.notNull(pageable, "Page info must not be null");
 
         // Find all post ids
-        Set<Integer> postIds = postTagRepository.findAllPostIdsByTagId(tagId, status);
+        Set<Integer> postIds = postTagRepository.findAllPostIdsByTagIdAndStatus(tagId, status);
 
         return MybatisPageHelper.fillPageData(postRepository.findAllByIdIn(postIds, MybatisPageHelper.changeToMybatisPage(pageable)), pageable);
     }

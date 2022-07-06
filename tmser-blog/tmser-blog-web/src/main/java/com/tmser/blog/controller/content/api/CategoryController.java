@@ -50,7 +50,7 @@ public class CategoryController {
 
     @GetMapping
     public List<? extends CategoryDTO> listCategories(
-            @SortDefault(sort = "updateTime, DESC") Sort sort,
+            @SortDefault(sort = "update_time, DESC") Sort sort,
             @RequestParam(name = "more", required = false, defaultValue = "false") Boolean more) {
         if (more) {
             return postCategoryService.listCategoryWithPostCountDto(sort, false);
@@ -61,7 +61,7 @@ public class CategoryController {
     @GetMapping("{slug}/posts")
     public Page<PostListVO> listPostsBy(@PathVariable("slug") String slug,
                                         @RequestParam(value = "password", required = false) String password,
-                                        @PageableDefault(sort = {"topPriority,DESC", "updateTime,DESC"})
+                                        @PageableDefault(sort = {"top_priority,DESC", "update_time,DESC"})
                                                 PageImpl pageable) {
         // Get category by slug
         Category category = categoryService.getBySlugOfNonNull(slug, true);

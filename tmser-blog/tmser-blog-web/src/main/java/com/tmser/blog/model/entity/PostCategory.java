@@ -20,12 +20,12 @@ import lombok.ToString;
  */
 @Getter
 @Setter
-@ToString(callSuper = true)
 @RequiredArgsConstructor
 @Entity
 @Table(name = "post_categories", indexes = {
     @Index(name = "post_categories_post_id", columnList = "post_id"),
     @Index(name = "post_categories_category_id", columnList = "category_id")})
+@ToString(callSuper = true)
 public class PostCategory extends BaseEntity {
 
     @Id

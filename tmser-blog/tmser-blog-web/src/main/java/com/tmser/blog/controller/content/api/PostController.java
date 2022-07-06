@@ -65,7 +65,7 @@ public class PostController {
      */
     @GetMapping
     public Page<PostListVO> pageBy(
-            @PageableDefault(sort = {"topPriority,DESC", "createTime,DESC"}) PageImpl pageable,
+            @PageableDefault(sort = {"top_priority,DESC", "create_time,DESC"}) PageImpl pageable,
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "categoryId", required = false) Integer categoryId) {
         PostQuery postQuery = new PostQuery();
@@ -78,7 +78,7 @@ public class PostController {
 
     @PostMapping(value = "search")
     public Page<BasePostSimpleDTO> pageBy(@RequestParam(value = "keyword") String keyword,
-                                          @PageableDefault(sort = "createTime, DESC") PageImpl pageable) {
+                                          @PageableDefault(sort = "create_time, DESC") PageImpl pageable) {
         Page<Post> postPage = postService.pageBy(keyword, pageable);
         return postService.convertToSimple(postPage);
     }
@@ -148,7 +148,7 @@ public class PostController {
     @GetMapping("{postId:\\d+}/comments/top_view")
     public Page<CommentWithHasChildrenVO> listTopComments(@PathVariable("postId") Integer postId,
                                                           @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-                                                          @SortDefault(sort = "createTime, DESC") Sort sort) {
+                                                          @SortDefault(sort = "create_time, DESC") Sort sort) {
         return postCommentService.pageTopCommentsBy(postId, CommentStatus.PUBLISHED,
                 PageImpl.of(page, optionService.getCommentPageSize(), sort));
     }
@@ -156,7 +156,7 @@ public class PostController {
     @GetMapping("{postId:\\d+}/comments/{commentParentId:\\d+}/children")
     public List<BaseCommentDTO> listChildrenBy(@PathVariable("postId") Integer postId,
                                                @PathVariable("commentParentId") Long commentParentId,
-                                               @SortDefault(sort = "createTime,DESC") Sort sort) {
+                                               @SortDefault(sort = "create_time,DESC") Sort sort) {
         // Find all children comments
         List<PostComment> postComments = postCommentService
                 .listChildrenBy(postId, commentParentId, CommentStatus.PUBLISHED, sort);
@@ -168,7 +168,7 @@ public class PostController {
     @GetMapping("{postId:\\d+}/comments/tree_view")
     public Page<BaseCommentVO> listCommentsTree(@PathVariable("postId") Integer postId,
                                                 @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-                                                @SortDefault(sort = "createTime, DESC") Sort sort) {
+                                                @SortDefault(sort = "create_time, DESC") Sort sort) {
         return postCommentService
                 .pageVosBy(postId, PageImpl.of(page, optionService.getCommentPageSize(), sort));
     }
@@ -176,7 +176,7 @@ public class PostController {
     @GetMapping("{postId:\\d+}/comments/list_view")
     public Page<BaseCommentWithParentVO> listComments(@PathVariable("postId") Integer postId,
                                                       @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-                                                      @SortDefault(sort = "createTime,DESC") Sort sort) {
+                                                      @SortDefault(sort = "create_time,DESC") Sort sort) {
         return postCommentService.pageWithParentVoBy(postId,
                 PageImpl.of(page, optionService.getCommentPageSize(), sort));
     }

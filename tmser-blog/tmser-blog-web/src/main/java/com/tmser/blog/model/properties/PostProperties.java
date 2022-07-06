@@ -39,7 +39,7 @@ public enum PostProperties implements PropertyEnum {
     /**
      * Post index sort.
      */
-    INDEX_SORT("post_index_sort", String.class, "createTime"),
+    INDEX_SORT("post_index_sort", String.class, "create_time"),
 
     /**
      * Enable auto cleaning recycled post.

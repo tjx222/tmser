@@ -58,7 +58,7 @@ public class SheetController {
 
     @GetMapping
     public Page<SheetListVO> pageBy(
-            @PageableDefault(sort = "createTime,DESC") PageImpl pageable) {
+            @PageableDefault(sort = "create_time,DESC") PageImpl pageable) {
         Page<Sheet> sheetPage = sheetService.pageBy(pageable);
         return sheetService.convertToListVo(sheetPage);
     }

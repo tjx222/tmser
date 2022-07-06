@@ -75,7 +75,7 @@ public interface PostTagRepository extends BaseRepository<PostTag> {
     @Select("select postTag.post_id from post_tags postTag, posts post where postTag.tag_id = #{tagId} and "
             + "post.id = postTag.post_id and post.status = #{status}")
     @NonNull
-    Set<Integer> findAllPostIdsByTagId(@NonNull @Param("tagId") Integer tagId, @NonNull @Param("status") PostStatus status);
+    Set<Integer> findAllPostIdsByTagIdAndStatus(@NonNull @Param("tagId") Integer tagId, @NonNull @Param("status") PostStatus status);
 
     /**
      * Finds all tags by post id in.
@@ -85,10 +85,10 @@ public interface PostTagRepository extends BaseRepository<PostTag> {
      */
     @NonNull
     @Select({"<script>"," select * from post_tags where post_id in ",
-            "<foreach item='item' index='index' collection='items' open='(' separator=',' close=')'>",
+            "<foreach item='item' index='index' collection='postIds' open='(' separator=',' close=')'>",
             "#{item}",
             "</foreach></script>"})
-    List<PostTag> findAllByPostIdIn(@NonNull Collection<Integer> postIds);
+    List<PostTag> findAllByPostIdIn(@NonNull @Param("postIds") Collection<Integer> postIds);
 
     /**
      * Deletes post tags by post id.
@@ -118,12 +118,12 @@ public interface PostTagRepository extends BaseRepository<PostTag> {
      */
     @NonNull
     @Select({"<script>","select count(post_id), tag_id from post_tags where post_id in ",
-            "<foreach item='item' index='index' collection='items' open='(' separator=',' close=')'>",
+            "<foreach item='item' index='index' collection='tagIds' open='(' separator=',' close=')'>",
             "#{item}",
             "</foreach>",
             "group by tag_id",
             "</script>"})
-    List<TagPostPostCountProjection> findPostCountByTagIds(@NonNull Collection<Integer> tagIds);
+    List<TagPostPostCountProjection> findPostCountByTagIds(@NonNull @Param("tagIds") Collection<Integer> tagIds);
 
     /**
      * Finds post count of tag.

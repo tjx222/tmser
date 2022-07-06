@@ -5,6 +5,9 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
+
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.util.Assert;
@@ -24,6 +27,7 @@ public class Content extends BaseEntity {
 
     @Id
     @Column(name = "post_id")
+    @TableId("post_id")
     private Integer id;
 
     @Column(name = "status")

@@ -38,13 +38,13 @@ public class PhotoController {
      */
     @GetMapping(value = "latest")
     public List<PhotoDTO> listPhotos(
-            @SortDefault(sort = "updateTime,DESC") Sort sort) {
+            @SortDefault(sort = "update_time,DESC") Sort sort) {
         return photoService.listDtos(sort);
     }
 
     @GetMapping
     public Page<PhotoDTO> pageBy(
-            @PageableDefault(sort = "updateTime, DESC") PageImpl pageable,
+            @PageableDefault(sort = "update_time, DESC") PageImpl pageable,
             PhotoQuery photoQuery) {
         return photoService.pageDtosBy(pageable, photoQuery);
     }

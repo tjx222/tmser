@@ -677,7 +677,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
         Set<Integer> categoryIds = ServiceUtils.fetchProperty(categories, Category::getId);
         Map<Integer, Category> idCategoryParamMap =
                 ServiceUtils.convertToMap(categories, Category::getId);
-        return categoryRepository.selectBatchIds(categoryIds)
+        return categoryIds.isEmpty() ? Collections.emptyList() : categoryRepository.selectBatchIds(categoryIds)
                 .stream()
                 .map(categoryToUpdate -> {
                     Category categoryParam = idCategoryParamMap.get(categoryToUpdate.getId());

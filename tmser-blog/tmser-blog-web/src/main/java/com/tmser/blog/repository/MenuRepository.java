@@ -26,7 +26,7 @@ public interface MenuRepository extends BaseRepository<Menu> {
      * @param name name must not be null.
      * @return true or false
      */
-    @Select(value = "select 1  from menus where name = #{name} limit 1")
+    @Select(value = "select count(*)  from menus where name = #{name} limit 1")
     boolean existsByName(@NonNull String name);
 
     /**
@@ -36,7 +36,7 @@ public interface MenuRepository extends BaseRepository<Menu> {
      * @param name name must not be null.
      * @return true or false.
      */
-    @Select(value = "select 1  from menus where name = #{name} and id <> #{id} limit 1")
+    @Select(value = "select count(*)  from menus where name = #{name} and id <> #{id} limit 1")
     boolean existsByIdNotAndName(@Param("id")@NonNull Integer id, @Param("name")@NonNull String name);
 
     /**

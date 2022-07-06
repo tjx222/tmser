@@ -36,7 +36,7 @@ public class TagController {
 
     @GetMapping
     public List<? extends TagDTO> listTags(
-            @SortDefault(sort = "createTime,DESC") Sort sort,
+            @SortDefault(sort = "create_time,DESC") Sort sort,
             @RequestParam(name = "more", required = false, defaultValue = "false") Boolean more) {
         if (more) {
             return postTagService.listTagWithCountDtos(sort);

@@ -123,7 +123,7 @@ public class SensitiveFiledInterceptor implements Interceptor {
             for (int i = 0; i < list.size(); i++) {
                 Object e = list.get(i);
                 if (e instanceof String) {
-                    list.add(i, sensitiveProcessor.decrypt(e));
+                    list.set(i, sensitiveProcessor.decrypt(e));
                 } else if (e instanceof Map) {
                     if (Objects.isNull(keys) || keys.length == 0) {
                         break;

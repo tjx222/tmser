@@ -7,6 +7,7 @@ import com.tmser.blog.service.LogService;
 import com.tmser.blog.service.base.AbstractCrudService;
 import com.tmser.model.page.Page;
 import com.tmser.model.page.PageImpl;
+import com.tmser.model.sort.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -34,9 +35,7 @@ public class LogServiceImpl extends AbstractCrudService<Log, Long> implements Lo
 
         // Build page request
         Page<Log> latestPageable = PageImpl.of(0, top);
-        //TODO sort add
-        // , Sort.by(Sort.Direction.DESC, "createTime"));
-        Page<LogDTO> resultPage = PageImpl.of(0, top);
+        Page<LogDTO> resultPage = PageImpl.of(0, top, Sort.by(Sort.Direction.DESC, "create_time"));
         // List all
         return resultPage.setContent(listAll(latestPageable).getContent()
                         .stream().map(log -> new LogDTO().<LogDTO>convertFrom(log)).collect(Collectors.toList()))

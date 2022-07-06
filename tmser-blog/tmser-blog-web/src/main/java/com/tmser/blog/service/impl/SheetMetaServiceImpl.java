@@ -1,5 +1,6 @@
 package com.tmser.blog.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.tmser.blog.model.entity.Option;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
@@ -10,6 +11,7 @@ import com.tmser.blog.repository.SheetMetaRepository;
 import com.tmser.blog.repository.SheetRepository;
 import com.tmser.blog.service.SheetMetaService;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -24,9 +26,9 @@ import java.util.Optional;
 public class SheetMetaServiceImpl extends BaseMetaServiceImpl<SheetMeta>
     implements SheetMetaService {
 
-    private final SheetMetaRepository sheetMetaRepository;
-
     private final SheetRepository sheetRepository;
+
+    private final SheetMetaRepository sheetMetaRepository;
 
     public SheetMetaServiceImpl(SheetMetaRepository sheetMetaRepository,
         SheetRepository sheetRepository) {
@@ -34,6 +36,17 @@ public class SheetMetaServiceImpl extends BaseMetaServiceImpl<SheetMeta>
         this.sheetMetaRepository = sheetMetaRepository;
         this.sheetRepository = sheetRepository;
     }
+
+    /**
+     * List All
+     *
+     * @return List
+     */
+    @Override
+    public List<SheetMeta> listAll() {
+        return sheetMetaRepository.selectList(new QueryWrapper<SheetMeta>().eq(true,"type", SheetMeta.MT_SHEET));
+    }
+
 
     @Override
     public void validateTarget(@NonNull Integer sheetId) {

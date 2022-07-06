@@ -1,11 +1,14 @@
 package com.tmser.blog.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.tmser.blog.exception.BadRequestException;
 import com.tmser.blog.exception.NotFoundException;
 import com.tmser.blog.model.dto.post.BasePostMinimalDTO;
+import com.tmser.blog.model.entity.SheetComment;
 import com.tmser.blog.model.entity.Sheet;
 import com.tmser.blog.model.entity.SheetComment;
 import com.tmser.blog.model.enums.SheetPermalinkType;
+import com.tmser.blog.model.params.CommentQuery;
 import com.tmser.blog.model.vo.SheetCommentWithSheetVO;
 import com.tmser.blog.repository.SheetCommentRepository;
 import com.tmser.blog.repository.SheetRepository;
@@ -13,8 +16,12 @@ import com.tmser.blog.service.OptionService;
 import com.tmser.blog.service.SheetCommentService;
 import com.tmser.blog.service.UserService;
 import com.tmser.blog.utils.ServiceUtils;
+import com.tmser.database.mybatis.MybatisPageHelper;
 import com.tmser.model.page.Page;
 import com.tmser.model.page.PageImpl;
+import com.tmser.model.page.Pageable;
+import com.tmser.model.sort.Sort;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -38,6 +45,8 @@ public class SheetCommentServiceImpl extends BaseCommentServiceImpl<SheetComment
         implements SheetCommentService {
 
     private final SheetRepository sheetRepository;
+    
+    private final SheetCommentRepository sheetCommentRepository;
 
     public SheetCommentServiceImpl(SheetCommentRepository sheetCommentRepository,
                                    OptionService optionService,
@@ -45,6 +54,7 @@ public class SheetCommentServiceImpl extends BaseCommentServiceImpl<SheetComment
                                    ApplicationEventPublisher eventPublisher,
                                    SheetRepository sheetRepository) {
         super(sheetCommentRepository, optionService, userService, eventPublisher);
+        this.sheetCommentRepository = sheetCommentRepository;
         this.sheetRepository = sheetRepository;
     }
 
@@ -75,6 +85,69 @@ public class SheetCommentServiceImpl extends BaseCommentServiceImpl<SheetComment
         return sheetCommentWithSheetVo;
     }
 
+
+    @Override
+    @NonNull
+    public Page<SheetComment> pageBy(@NonNull CommentQuery commentQuery, @NonNull Page page) {
+        Assert.notNull(page, "Page info must not be null");
+        QueryWrapper<SheetComment> qm = new QueryWrapper<>();
+        qm.eq("type", SheetComment.CT_SHEET);
+        if (commentQuery.getStatus() != null) {
+            qm.eq("status", commentQuery.getStatus());
+        }
+
+        if (commentQuery.getKeyword() != null) {
+            String kw = StringUtils.strip(commentQuery.getKeyword());
+            qm.or(w -> w.like("author", kw).like("content", kw).like("email", kw));
+        }
+        return MybatisPageHelper.fillPageData(sheetCommentRepository.selectPage(MybatisPageHelper.changeToMybatisPage(page), qm), page);
+    }
+
+    /**
+     * List All
+     *
+     * @return List
+     */
+    @Override
+    public List<SheetComment> listAll() {
+        return sheetCommentRepository.selectList(
+                new QueryWrapper<SheetComment>().eq(true, "type", SheetComment.CT_SHEET)
+        );
+    }
+
+    /**
+     * List all by sort
+     *
+     * @param sort sort
+     * @return List
+     */
+    @Override
+    public List<SheetComment> listAll(Sort sort) {
+        Assert.notNull(sort, "Sort info must not be null");
+        final QueryWrapper<SheetComment> domainQueryWrapper = new QueryWrapper<>();
+        domainQueryWrapper.eq("type", SheetComment.CT_JOUR);
+        sort.stream().forEach(orderItem -> {
+            domainQueryWrapper.orderBy(true, orderItem.getDirection() == Sort.Direction.ASC, orderItem.getProperty());
+        });
+        return sheetCommentRepository.selectList(domainQueryWrapper);
+    }
+
+    /**
+     * List all by pageable
+     *
+     * @param pageable pageable
+     * @return Page
+     */
+    @Override
+    public Page<SheetComment> listAll(Pageable pageable) {
+        Assert.notNull(pageable, "Pageable info must not be null");
+
+        return MybatisPageHelper.fillPageData(
+                sheetCommentRepository.selectPage(MybatisPageHelper.changeToMybatisPage(pageable),
+                        new QueryWrapper<SheetComment>().eq(true, "type", SheetComment.CT_SHEET)), pageable);
+    }
+
+
     @Override
     @NonNull
     public List<SheetCommentWithSheetVO> convertToWithSheetVo(List<SheetComment> sheetComments) {
@@ -84,7 +157,7 @@ public class SheetCommentServiceImpl extends BaseCommentServiceImpl<SheetComment
 
         Set<Integer> sheetIds = ServiceUtils.fetchProperty(sheetComments, SheetComment::getPostId);
 
-        Map<Integer, Sheet> sheetMap =
+        Map<Integer, Sheet> sheetMap = sheetIds.isEmpty() ? Collections.emptyMap() :
                 ServiceUtils.convertToMap(sheetRepository.selectBatchIds(sheetIds), Sheet::getId);
 
         return sheetComments.stream()

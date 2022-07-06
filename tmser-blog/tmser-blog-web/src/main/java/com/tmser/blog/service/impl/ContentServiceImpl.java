@@ -53,7 +53,7 @@ public class ContentServiceImpl extends AbstractCrudService<Content, Integer>
         if (savedContentOptional.isPresent()) {
             Content savedContent = savedContentOptional.get();
             savedContent.setHeadPatchLogId(contentPatchLog.getId());
-            contentRepository.insert(savedContent);
+            contentRepository.updateById(savedContent);
             return;
         }
 
@@ -87,7 +87,7 @@ public class ContentServiceImpl extends AbstractCrudService<Content, Integer>
         postContent.setContent(patchedContent.getContent());
         postContent.setOriginalContent(patchedContent.getOriginalContent());
 
-        contentRepository.insert(postContent);
+        contentRepository.updateById(postContent);
 
         return postContent;
     }

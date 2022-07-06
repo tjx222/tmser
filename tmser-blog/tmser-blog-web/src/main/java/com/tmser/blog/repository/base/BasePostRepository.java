@@ -27,7 +27,6 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      *
      * @return total visits
      */
-    @Select("select sum(p.visits) from posts p")
     Long countVisit();
 
     /**
@@ -35,7 +34,6 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      *
      * @return total likes
      */
-    @Select("select sum(p.likes) from posts p")
     Long countLike();
 
     /**
@@ -46,8 +44,7 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * @return a page of post
      */
     @NonNull
-    @Select("select * from posts where status = #{status}")
-    IPage<POST> findAllByStatus(@NonNull PostStatus status, @NonNull IPage pageable);
+    IPage<POST> findPageByStatus(@NonNull PostStatus status, @NonNull IPage pageable);
 
     /**
      * Finds posts by status.
@@ -56,7 +53,6 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * @return a list of post
      */
     @NonNull
-    @Select("select * from posts where status = #{status}")
     List<POST> findAllByStatus(@NonNull PostStatus status);
 
     /**
@@ -67,8 +63,7 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * @return a list of post
      */
     @NonNull
-    @Select("select * from posts where status = #{status} order by #{sort}" )
-    List<POST> findAllByStatus(@NonNull @Param("status") PostStatus status, @Param("sort") @NonNull Sort sort);
+    List<POST> findAndSortAllByStatus(@NonNull @Param("status") PostStatus status, @Param("sort") @NonNull Sort sort);
 
     /**
      * Finds all post by status and create time before.
@@ -79,7 +74,6 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * @return a page of post
      */
     @NonNull
-    @Select("select * from posts where status = #{status}  and create_time < #{createTime}" )
     IPage<POST> findAllByStatusAndCreateTimeBefore(@NonNull @Param("status") PostStatus status,
                                                    @NonNull @Param("createTime") Date createTime, @NonNull IPage pageable);
 
@@ -92,7 +86,6 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * @return a page of post
      */
     @NonNull
-    @Select("select * from posts where status = #{status}  and create_time > #{createTime}" )
     IPage<POST> findAllByStatusAndCreateTimeAfter(@NonNull @Param("status") PostStatus status,
                                                   @NonNull @Param("createTime")Date createTime, @NonNull IPage pageable);
 
@@ -105,7 +98,6 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * @return a page of post
      */
     @NonNull
-    @Select("select * from posts where status = #{status}  and edit_time < #{editTime}" )
     IPage<POST> findAllByStatusAndEditTimeBefore(@NonNull @Param("status") PostStatus status, @NonNull@Param("editTime") Date editTime,
                                                  @NonNull IPage pageable);
 
@@ -118,7 +110,6 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * @return a page of post
      */
     @NonNull
-    @Select("select * from posts where status = #{status}  and edit_time > #{editTime}" )
     IPage<POST> findAllByStatusAndEditTimeAfter(@NonNull @Param("status") PostStatus status, @NonNull@Param("editTime") Date editTime,
                                                 @NonNull IPage pageable);
 
@@ -131,7 +122,6 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * @return a page of post
      */
     @NonNull
-    @Select("select * from posts where status = #{status}  and edit_time > #{editTime}" )
     IPage<POST> findAllByStatusAndVisitsBefore(@NonNull @Param("status") PostStatus status, @NonNull Long visits,
                                                @NonNull IPage pageable);
 
@@ -144,7 +134,6 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * @return a page of post
      */
     @NonNull
-    @Select("select * from posts where status = #{status}  and visits > #{visits}" )
     IPage<POST> findAllByStatusAndVisitsAfter(@NonNull @Param("status") PostStatus status, @NonNull @Param("visits") Long visits,
                                               @NonNull IPage pageable);
 
@@ -156,7 +145,6 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * @return an optional post
      */
     @NonNull
-    @Select("select * from posts where status = #{status}  and slug = #{slug}" )
     Optional<POST> getBySlugAndStatus(@NonNull @Param("slug") String slug, @NonNull @Param("status") PostStatus status);
 
     /**
@@ -177,7 +165,6 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * @param status status
      * @return posts count
      */
-    @Select("select count(*) from posts where status = #{status}" )
     long countByStatus(@NonNull @Param("status") PostStatus status);
 
     /**
@@ -186,7 +173,6 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * @param slug slug must not be null.
      * @return true or false.
      */
-    @Select("select 1 from posts where slug = #{slug} limit 1" )
     boolean existsBySlug(@NonNull @Param("slug") String slug);
 
     /**
@@ -196,7 +182,6 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * @param slug slug must not be null.
      * @return true or false.
      */
-    @Select("select 1 from posts where slug = #{slug} and id = #{id} limit 1" )
     boolean existsByIdNotAndSlug(@NonNull @Param("id") Integer id, @Param("slug") @NonNull String slug);
 
     /**
@@ -205,7 +190,6 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * @param slug post slug
      * @return post or empty
      */
-    @Select("select * from posts where slug = #{slug} limit 1" )
     Optional<POST> getBySlug(@NonNull String slug);
 
     /**

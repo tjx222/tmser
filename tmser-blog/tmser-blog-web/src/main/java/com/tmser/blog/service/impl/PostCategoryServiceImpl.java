@@ -119,7 +119,7 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
         // Find all post ids
         Set<Integer> postIds = postCategoryRepository.findAllPostIdsByCategoryId(categoryId);
 
-        return postRepository.selectBatchIds(postIds);
+        return postIds.isEmpty() ? Collections.emptyList() : postRepository.selectBatchIds(postIds);
     }
 
     @Override
@@ -129,9 +129,9 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
 
         // Find all post ids
         Set<Integer> postIds =
-                postCategoryRepository.findAllPostIdsByCategoryId(categoryId, status);
+                postCategoryRepository.findAllPostIdsByCategoryIdAndStatus(categoryId, status);
 
-        return postRepository.selectBatchIds(postIds);
+        return postIds.isEmpty() ? Collections.emptyList() : postRepository.selectBatchIds(postIds);
     }
 
     @Override
@@ -141,9 +141,9 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
 
         // Find all post ids
         Set<Integer> postIds = postCategoryRepository
-                .findAllPostIdsByCategoryId(categoryId, status);
+                .findAllPostIdsByCategoryIdAndStatuses(categoryId, status);
 
-        return postRepository.selectBatchIds(postIds);
+        return postIds.isEmpty() ? Collections.emptyList() : postRepository.selectBatchIds(postIds);
     }
 
     @Override
@@ -158,9 +158,9 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
         }
 
         Set<Integer> postsIds = postCategoryRepository
-                .findAllPostIdsByCategoryId(category.getId(), status);
+                .findAllPostIdsByCategoryIdAndStatuses(category.getId(), status);
 
-        return postRepository.selectBatchIds(postsIds);
+        return postsIds.isEmpty() ? Collections.emptyList() : postRepository.selectBatchIds(postsIds);
     }
 
     @Override
@@ -175,9 +175,9 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
         }
 
         Set<Integer> postsIds =
-                postCategoryRepository.findAllPostIdsByCategoryId(category.getId(), status);
+                postCategoryRepository.findAllPostIdsByCategoryIdAndStatus(category.getId(), status);
 
-        return postRepository.selectBatchIds(postsIds);
+        return postsIds.isEmpty() ? Collections.emptyList() : postRepository.selectBatchIds(postsIds);
     }
 
     @Override
@@ -199,7 +199,7 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
 
         // Find all post ids
         Set<Integer> postIds = postCategoryRepository
-                .findAllPostIdsByCategoryId(categoryId, status);
+                .findAllPostIdsByCategoryIdAndStatus(categoryId, status);
 
         return MybatisPageHelper.fillPageData(
                 postRepository.findAllByIdIn(postIds, MybatisPageHelper.changeToMybatisPage(pageable)), pageable);
@@ -213,7 +213,7 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
 
         // Find all post ids
         Set<Integer> postIds =
-                postCategoryRepository.findAllPostIdsByCategoryId(categoryId, status);
+                postCategoryRepository.findAllPostIdsByCategoryIdAndStatuses(categoryId, status);
 
         return MybatisPageHelper.fillPageData(
                 postRepository.findAllByIdIn(postIds, MybatisPageHelper.changeToMybatisPage(pageable)), pageable);

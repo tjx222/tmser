@@ -15,8 +15,8 @@ import javax.persistence.*;
         @Index(name = "posts_create_time", columnList = "create_time")})
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.INTEGER,
         columnDefinition = "int default 0")
-@DiscriminatorValue(value = "0")
+@DiscriminatorValue(value = BasePost.T_POST+"")
 @Data
 public class Post extends BasePost {
-    private Integer type = 0;
+    private Integer type = T_POST;
 }

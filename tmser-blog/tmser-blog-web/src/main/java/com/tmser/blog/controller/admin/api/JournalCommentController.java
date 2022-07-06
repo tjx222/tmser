@@ -42,7 +42,7 @@ public class JournalCommentController {
 
     @GetMapping
     public Page<JournalCommentWithJournalVO> pageBy(
-            @PageableDefault(sort = "createTime, DESC") PageImpl pageable,
+            @PageableDefault(sort = "create_time, DESC") PageImpl pageable,
             CommentQuery commentQuery) {
         Page<JournalComment> journalCommentPage =
                 journalCommentService.pageBy(commentQuery, pageable);
@@ -62,7 +62,7 @@ public class JournalCommentController {
     @GetMapping("{journalId:\\d+}/tree_view")
     public Page<BaseCommentVO> listCommentTree(@PathVariable("journalId") Integer journalId,
                                                @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-                                               @SortDefault(sort = "createTime, DESC") Sort sort) {
+                                               @SortDefault(sort = "create_time, DESC") Sort sort) {
         return journalCommentService.pageVosAllBy(journalId,
                 PageImpl.of(page, optionService.getCommentPageSize(), sort));
     }
@@ -70,7 +70,7 @@ public class JournalCommentController {
     @GetMapping("{journalId:\\d+}/list_view")
     public Page<BaseCommentWithParentVO> listComments(@PathVariable("journalId") Integer journalId,
                                                       @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-                                                      @SortDefault(sort = "createTime, DESC") Sort sort) {
+                                                      @SortDefault(sort = "create_time, DESC") Sort sort) {
         return journalCommentService.pageWithParentVoBy(journalId,
                 PageImpl.of(page, optionService.getCommentPageSize(), sort));
     }

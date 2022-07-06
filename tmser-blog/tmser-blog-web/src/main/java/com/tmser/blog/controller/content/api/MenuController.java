@@ -35,7 +35,7 @@ public class MenuController {
 
     @GetMapping(value = "tree_view")
     public List<MenuVO> listMenusTree(
-            @SortDefault(sort = "createTime, DESC") Sort sort) {
+            @SortDefault(sort = "create_time, DESC") Sort sort) {
         return menuService.listAsTree(sort);
     }
 }

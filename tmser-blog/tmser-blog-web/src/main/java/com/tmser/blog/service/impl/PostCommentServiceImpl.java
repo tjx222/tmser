@@ -1,13 +1,16 @@
 package com.tmser.blog.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.tmser.blog.exception.BadRequestException;
 import com.tmser.blog.exception.ForbiddenException;
 import com.tmser.blog.exception.NotFoundException;
 import com.tmser.blog.model.dto.post.BasePostMinimalDTO;
+import com.tmser.blog.model.entity.JournalComment;
 import com.tmser.blog.model.entity.Post;
 import com.tmser.blog.model.entity.PostComment;
 import com.tmser.blog.model.enums.CommentViolationTypeEnum;
 import com.tmser.blog.model.enums.PostPermalinkType;
+import com.tmser.blog.model.params.CommentQuery;
 import com.tmser.blog.model.properties.CommentProperties;
 import com.tmser.blog.model.vo.PostCommentWithPostVO;
 import com.tmser.blog.repository.PostCommentRepository;
@@ -19,9 +22,13 @@ import com.tmser.blog.service.UserService;
 import com.tmser.blog.utils.DateUtils;
 import com.tmser.blog.utils.ServiceUtils;
 import com.tmser.blog.utils.ServletUtils;
+import com.tmser.database.mybatis.MybatisPageHelper;
 import com.tmser.model.page.Page;
 import com.tmser.model.page.PageImpl;
+import com.tmser.model.page.Pageable;
+import com.tmser.model.sort.Sort;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -48,6 +55,7 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment>
     private final PostRepository postRepository;
 
     private final CommentBlackListService commentBlackListService;
+    private final PostCommentRepository postCommentRepository;
 
     public PostCommentServiceImpl(PostCommentRepository postCommentRepository,
                                   PostRepository postRepository,
@@ -56,6 +64,7 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment>
                                   CommentBlackListService commentBlackListService,
                                   ApplicationEventPublisher eventPublisher) {
         super(postCommentRepository, optionService, userService, eventPublisher);
+        this.postCommentRepository = postCommentRepository;
         this.postRepository = postRepository;
         this.commentBlackListService = commentBlackListService;
     }
@@ -88,6 +97,68 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment>
 
     @Override
     @NonNull
+    public Page<PostComment> pageBy(@NonNull CommentQuery commentQuery, @NonNull Page page) {
+        Assert.notNull(page, "Page info must not be null");
+        QueryWrapper<PostComment> qm = new QueryWrapper<>();
+        qm.eq("type", PostComment.CT_POST);
+        if (commentQuery.getStatus() != null) {
+            qm.eq("status", commentQuery.getStatus());
+        }
+
+        if (commentQuery.getKeyword() != null) {
+            String kw = StringUtils.strip(commentQuery.getKeyword());
+            qm.or(w -> w.like("author", kw).like("content", kw).like("email", kw));
+        }
+        return MybatisPageHelper.fillPageData(postCommentRepository.selectPage(MybatisPageHelper.changeToMybatisPage(page), qm), page);
+    }
+
+    /**
+     * List All
+     *
+     * @return List
+     */
+    @Override
+    public List<PostComment> listAll() {
+        return postCommentRepository.selectList(
+                new QueryWrapper<PostComment>().eq(true, "type", PostComment.CT_POST)
+        );
+    }
+
+    /**
+     * List all by sort
+     *
+     * @param sort sort
+     * @return List
+     */
+    @Override
+    public List<PostComment> listAll(Sort sort) {
+        Assert.notNull(sort, "Sort info must not be null");
+        final QueryWrapper<PostComment> domainQueryWrapper = new QueryWrapper<>();
+        domainQueryWrapper.eq("type", PostComment.CT_JOUR);
+        sort.stream().forEach(orderItem -> {
+            domainQueryWrapper.orderBy(true, orderItem.getDirection() == Sort.Direction.ASC, orderItem.getProperty());
+        });
+        return postCommentRepository.selectList(domainQueryWrapper);
+    }
+
+    /**
+     * List all by pageable
+     *
+     * @param pageable pageable
+     * @return Page
+     */
+    @Override
+    public Page<PostComment> listAll(Pageable pageable) {
+        Assert.notNull(pageable, "Pageable info must not be null");
+
+        return MybatisPageHelper.fillPageData(
+                postCommentRepository.selectPage(MybatisPageHelper.changeToMybatisPage(pageable),
+                        new QueryWrapper<PostComment>().eq(true, "type", PostComment.CT_POST)), pageable);
+    }
+
+
+    @Override
+    @NonNull
     public List<PostCommentWithPostVO> convertToWithPostVo(List<PostComment> postComments) {
         if (CollectionUtils.isEmpty(postComments)) {
             return Collections.emptyList();
@@ -97,7 +168,7 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment>
         Set<Integer> postIds = ServiceUtils.fetchProperty(postComments, PostComment::getPostId);
 
         // Get all posts
-        Map<Integer, Post> postMap =
+        Map<Integer, Post> postMap = postIds.isEmpty() ? Collections.emptyMap() :
                 ServiceUtils.convertToMap(postRepository.selectBatchIds(postIds), Post::getId);
 
         return postComments.stream()

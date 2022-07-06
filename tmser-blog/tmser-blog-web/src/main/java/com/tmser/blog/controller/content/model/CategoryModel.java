@@ -100,7 +100,7 @@ public class CategoryModel {
 
         final PageImpl pageable = PageImpl.of(page - 1,
                 optionService.getArchivesPageSize(),
-                Sort.by(DESC, "topPriority", "createTime"));
+                Sort.by(DESC, "top_priority", "create_time"));
         Page<Post> postPage =
                 postCategoryService.pagePostBy(category.getId(), statuses, pageable);
         Page<PostListVO> posts = postService.convertToListVo(postPage);

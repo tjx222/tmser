@@ -325,7 +325,7 @@ public abstract class SortHandlerMethodArgumentResolverSupport implements Handle
          */
         public SortOrderParser parseIgnoreCase() {
 
-            Optional<Boolean> ignoreCase = lastIndex > 0 ? fromOptionalString(elements[lastIndex - 1]) : Optional.empty();
+            Optional<Boolean> ignoreCase = lastIndex > 0 ? fromOptionalString(elements[lastIndex - 1].trim()) : Optional.empty();
 
             return new SortOrderParser(elements, lastIndex - (ignoreCase.isPresent() ? 1 : 0), direction, ignoreCase);
         }
@@ -337,7 +337,7 @@ public abstract class SortHandlerMethodArgumentResolverSupport implements Handle
          */
         public SortOrderParser parseDirection() {
 
-            Optional<Direction> direction = lastIndex > 0 ? Direction.fromOptionalString(elements[lastIndex - 1])
+            Optional<Direction> direction = lastIndex > 0 ? Direction.fromOptionalString(elements[lastIndex - 1].trim())
                     : Optional.empty();
 
             return new SortOrderParser(elements, lastIndex - (direction.isPresent() ? 1 : 0), direction, ignoreCase);

@@ -25,6 +25,7 @@ import com.tmser.blog.utils.*;
 import com.tmser.database.mybatis.MybatisPageHelper;
 import com.tmser.model.page.Page;
 import com.tmser.model.page.PageImpl;
+import com.tmser.model.page.Pageable;
 import com.tmser.model.sort.Sort;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -133,6 +134,47 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                 postRepository.selectPage(MybatisPageHelper.changeToMybatisPage(pageable), buildSpecByQuery(postQuery)), pageable);
     }
 
+    /**
+     * List All
+     *
+     * @return List
+     */
+    @Override
+    public List<Post> listAll() {
+        return postRepository.selectList(new QueryWrapper().eq(true,"type", Post.T_POST));
+    }
+
+    /**
+     * List all by sort
+     *
+     * @param sort sort
+     * @return List
+     */
+    @Override
+    public List<Post> listAll(Sort sort) {
+        Assert.notNull(sort, "Sort info must not be null");
+        final QueryWrapper<Post> domainQueryWrapper = new QueryWrapper<>();
+        domainQueryWrapper.eq("type", Post.T_POST);
+        sort.stream().forEach(orderItem -> {
+            domainQueryWrapper.orderBy(true, orderItem.getDirection() == Sort.Direction.ASC, orderItem.getProperty());
+        });
+        return postRepository.selectList(domainQueryWrapper);
+    }
+
+    /**
+     * List all by pageable
+     *
+     * @param pageable pageable
+     * @return Page
+     */
+    @Override
+    public Page<Post> listAll(Pageable pageable) {
+        Assert.notNull(pageable, "Pageable info must not be null");
+
+        return MybatisPageHelper.fillPageData(
+                postRepository.selectPage(MybatisPageHelper.changeToMybatisPage(pageable), buildSpecByQuery(null)), pageable);
+    }
+
     @Override
     @Transactional
     public PostDetailVO createBy(Post postToCreate, Set<Integer> tagIds, Set<Integer> categoryIds,
@@ -187,7 +229,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         Assert.notNull(month, "Post create month must not be null");
         Assert.notNull(slug, "Post slug must not be null");
 
-        Optional<Post> postOptional = postRepository.findBy(year, month, slug);
+        Optional<Post> postOptional = postRepository.findBy(year, month, null, slug, null);
 
         return postOptional
                 .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(slug));
@@ -199,7 +241,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         Assert.notNull(year, "Post create year must not be null");
         Assert.notNull(slug, "Post slug must not be null");
 
-        Optional<Post> postOptional = postRepository.findBy(year, slug);
+        Optional<Post> postOptional = postRepository.findBy(year, null, null, slug, null);
 
         return postOptional
                 .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(slug));
@@ -212,7 +254,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         Assert.notNull(slug, "Post slug must not be null");
         Assert.notNull(status, "Post status must not be null");
 
-        Optional<Post> postOptional = postRepository.findBy(year, month, slug, status);
+        Optional<Post> postOptional = postRepository.findBy(year, month, null, slug, status);
 
         return postOptional
                 .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(slug));
@@ -225,7 +267,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         Assert.notNull(day, "Post create day must not be null");
         Assert.notNull(slug, "Post slug must not be null");
 
-        Optional<Post> postOptional = postRepository.findBy(year, month, day, slug);
+        Optional<Post> postOptional = postRepository.findBy(year, month, day, slug, null);
 
         return postOptional
                 .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(slug));
@@ -278,7 +320,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     public List<ArchiveYearVO> listYearArchives() {
         // Get all posts
         List<Post> posts = postRepository
-                .findAllByStatus(PostStatus.PUBLISHED, Sort.by(DESC, "createTime"));
+                .findAndSortAllByStatus(PostStatus.PUBLISHED, Sort.by(DESC, "create_time"));
 
         return convertToYearArchives(posts);
     }
@@ -287,7 +329,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     public List<ArchiveMonthVO> listMonthArchives() {
         // Get all posts
         List<Post> posts = postRepository
-                .findAllByStatus(PostStatus.PUBLISHED, Sort.by(DESC, "createTime"));
+                .findAndSortAllByStatus(PostStatus.PUBLISHED, Sort.by(DESC, "create_time"));
 
         return convertToMonthArchives(posts);
     }
@@ -807,9 +849,11 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
      */
     @NonNull
     private QueryWrapper<Post> buildSpecByQuery(@NonNull PostQuery postQuery) {
-        Assert.notNull(postQuery, "Post query must not be null");
-
         QueryWrapper<Post> wrapper = new QueryWrapper<>();
+        wrapper.eq("type", Post.T_POST);
+        if(postQuery == null){
+            return wrapper;
+        }
         Set<PostStatus> statuses = postQuery.getStatuses();
         if (!CollectionUtils.isEmpty(statuses)) {
             wrapper.in("status", statuses);
@@ -934,7 +978,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     Sort getPostDefaultSort() {
         String indexSort = optionService.getByPropertyOfNonNull(PostProperties.INDEX_SORT)
                 .toString();
-        return Sort.by(DESC, "topPriority").and(Sort.by(DESC, indexSort).and(Sort.by(DESC, "id")));
+        return Sort.by(DESC, "top_priority").and(Sort.by(DESC, indexSort).and(Sort.by(DESC, "id")));
     }
 
     @Override

@@ -56,7 +56,7 @@ public class OptionController {
 
     @GetMapping("list_view")
     public Page<OptionSimpleDTO> listAllWithListView(
-            @PageableDefault(sort = "updateTime, DESC") PageImpl pageable,
+            @PageableDefault(sort = "update_time, DESC") PageImpl pageable,
             OptionQuery optionQuery) {
         return optionService.pageDtosBy(pageable, optionQuery);
     }

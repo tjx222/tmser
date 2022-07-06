@@ -187,7 +187,7 @@ public class ContentFeedController {
     @GetMapping(value = {"sitemap", "sitemap.xml"}, produces = XML_MEDIA_TYPE)
     @ResponseBody
     public String sitemapXml(Model model,
-                             @PageableDefault(size = Integer.MAX_VALUE, sort = "createTime, DESC")
+                             @PageableDefault(size = Integer.MAX_VALUE, sort = "create_time, DESC")
                                      PageImpl pageable) throws IOException, TemplateException {
         model.addAttribute("posts", buildPosts(pageable));
         Template template = freeMarker.getConfiguration().getTemplate("common/web/sitemap_xml.ftl");
@@ -202,7 +202,7 @@ public class ContentFeedController {
      */
     @GetMapping(value = "sitemap.html")
     public String sitemapHtml(Model model,
-                              @PageableDefault(size = Integer.MAX_VALUE, sort = "createTime, DESC")
+                              @PageableDefault(size = Integer.MAX_VALUE, sort = "create_time, DESC")
                                       PageImpl pageable) {
         model.addAttribute("posts", buildPosts(pageable));
         return "common/web/sitemap_html";
@@ -231,7 +231,7 @@ public class ContentFeedController {
      */
     @NonNull
     private Page buildPostPageable(int size) {
-        return PageImpl.of(0, size, Sort.by(DESC, "createTime"));
+        return PageImpl.of(0, size, Sort.by(DESC, "create_time"));
     }
 
     /**

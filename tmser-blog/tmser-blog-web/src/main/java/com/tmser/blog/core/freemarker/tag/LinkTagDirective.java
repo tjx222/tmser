@@ -45,11 +45,11 @@ public class LinkTagDirective implements TemplateDirectiveModel {
                     break;
                 case "listTeams":
                     env.setVariable("teams",
-                            builder.build().wrap(linkService.listTeamVos(Sort.by(DESC, "createTime"))));
+                            builder.build().wrap(linkService.listTeamVos(Sort.by(DESC, "create_time"))));
                     break;
                 case "listTeamsByRandom":
                     env.setVariable("teams", builder.build()
-                            .wrap(linkService.listTeamVosByRandom(Sort.by(DESC, "createTime"))));
+                            .wrap(linkService.listTeamVosByRandom(Sort.by(DESC, "create_time"))));
                     break;
                 case "count":
                     env.setVariable("count", builder.build().wrap(linkService.count()));

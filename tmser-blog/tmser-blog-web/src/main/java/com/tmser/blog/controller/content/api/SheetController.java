@@ -48,7 +48,7 @@ public class SheetController {
 
     @GetMapping
     public Page<SheetListVO> pageBy(
-            @PageableDefault(sort = "createTime,DESC") PageImpl pageable) {
+            @PageableDefault(sort = "create_time,DESC") PageImpl pageable) {
         Page<Sheet> sheetPage = sheetService.pageBy(PostStatus.PUBLISHED, pageable);
         return sheetService.convertToListVo(sheetPage);
     }
@@ -102,7 +102,7 @@ public class SheetController {
     @GetMapping("{sheetId:\\d+}/comments/top_view")
     public Page<CommentWithHasChildrenVO> listTopComments(@PathVariable("sheetId") Integer sheetId,
                                                           @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-                                                          @SortDefault(sort = "createTime,DESC") Sort sort) {
+                                                          @SortDefault(sort = "create_time,DESC") Sort sort) {
         return sheetCommentService.pageTopCommentsBy(sheetId, CommentStatus.PUBLISHED,
                 PageImpl.of(page, optionService.getCommentPageSize(), sort));
     }
@@ -110,7 +110,7 @@ public class SheetController {
     @GetMapping("{sheetId:\\d+}/comments/{commentParentId:\\d+}/children")
     public List<BaseCommentDTO> listChildrenBy(@PathVariable("sheetId") Integer sheetId,
                                                @PathVariable("commentParentId") Long commentParentId,
-                                               @SortDefault(sort = "createTime, DESC") Sort sort) {
+                                               @SortDefault(sort = "create_time, DESC") Sort sort) {
         // Find all children comments
         List<SheetComment> sheetComments = sheetCommentService
                 .listChildrenBy(sheetId, commentParentId, CommentStatus.PUBLISHED, sort);
@@ -122,7 +122,7 @@ public class SheetController {
     @GetMapping("{sheetId:\\d+}/comments/tree_view")
     public Page<BaseCommentVO> listCommentsTree(@PathVariable("sheetId") Integer sheetId,
                                                 @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-                                                @SortDefault(sort = "createTime, DESC") Sort sort) {
+                                                @SortDefault(sort = "create_time, DESC") Sort sort) {
         return sheetCommentService
                 .pageVosBy(sheetId, PageImpl.of(page, optionService.getCommentPageSize(), sort));
     }
@@ -130,7 +130,7 @@ public class SheetController {
     @GetMapping("{sheetId:\\d+}/comments/list_view")
     public Page<BaseCommentWithParentVO> listComments(@PathVariable("sheetId") Integer sheetId,
                                                       @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-                                                      @SortDefault(sort = "createTime,DESC") Sort sort) {
+                                                      @SortDefault(sort = "create_time,DESC") Sort sort) {
         return sheetCommentService.pageWithParentVoBy(sheetId,
                 PageImpl.of(page, optionService.getCommentPageSize(), sort));
     }

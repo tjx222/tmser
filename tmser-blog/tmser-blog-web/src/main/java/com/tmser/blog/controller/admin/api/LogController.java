@@ -36,7 +36,7 @@ public class LogController {
 
     @GetMapping
     public Page<LogDTO> pageBy(
-            @PageableDefault(sort = "createTime, DESC") Pageable pageable) {
+            @PageableDefault(sort = "create_time, DESC") Pageable pageable) {
         Page<Log> logPage = logService.listAll(pageable);
         return logPage.convert(log -> new LogDTO().convertFrom(log));
     }

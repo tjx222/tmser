@@ -5,6 +5,8 @@ import lombok.ToString;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.Index;
+import javax.persistence.Table;
 
 /**
  * Journal comment.
@@ -13,10 +15,13 @@ import javax.persistence.Entity;
  * @date 2019-04-25
  */
 @Entity(name = "JournalComment")
-@DiscriminatorValue("2")
+@Table(name = "comments", indexes = {
+        @Index(name = "comments_post_id", columnList = "post_id"),
+        @Index(name = "comments_type_status", columnList = "type, status"),
+        @Index(name = "comments_parent_id", columnList = "parent_id")})
+@DiscriminatorValue(JournalComment.CT_JOUR+"")
 @Data
-@ToString
+@ToString(callSuper = true)
 public class JournalComment extends BaseComment {
-
-    private Integer type = 2;
+    private Integer type = CT_JOUR;
 }

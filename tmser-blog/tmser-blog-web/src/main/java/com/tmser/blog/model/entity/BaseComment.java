@@ -24,15 +24,16 @@ import com.tmser.blog.utils.ServiceUtils;
  */
 @Data
 @Entity(name = "BaseComment")
-@Table(name = "comments", indexes = {
-    @Index(name = "comments_post_id", columnList = "post_id"),
-    @Index(name = "comments_type_status", columnList = "type, status"),
-    @Index(name = "comments_parent_id", columnList = "parent_id")})
+
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.INTEGER,
     columnDefinition = "int default 0")
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class BaseComment extends BaseEntity {
+
+    public static final int CT_POST = 0;
+    public static final int CT_SHEET = 1;
+    public static final int CT_JOUR = 2;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "custom-id")

@@ -2,6 +2,7 @@ package com.tmser.blog.model.entity;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.Table;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,11 +16,12 @@ import lombok.ToString;
  * @date 2019-08-04
  */
 @Entity(name = "PostMeta")
-@DiscriminatorValue("0")
+@DiscriminatorValue(PostMeta.MT_POST+"")
 @EqualsAndHashCode(callSuper = true)
 @Data
-@ToString
+@ToString(callSuper = true)
+@Table(name = "metas")
 public class PostMeta extends BaseMeta {
 
-    private Integer type = 0;
+    private Integer type = MT_POST;
 }

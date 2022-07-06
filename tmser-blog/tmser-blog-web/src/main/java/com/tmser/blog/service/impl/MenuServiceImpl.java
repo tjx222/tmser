@@ -158,7 +158,7 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
     public List<Menu> updateInBatch(@NonNull Collection<Menu> menus) {
         Set<Integer> menuIds = ServiceUtils.fetchProperty(menus, Menu::getId);
         Map<Integer, Menu> idMenuParamMap = ServiceUtils.convertToMap(menus, Menu::getId);
-        return menuRepository.selectBatchIds(menuIds)
+        return menuIds.isEmpty() ? Collections.emptyList() : menuRepository.selectBatchIds(menuIds)
                 .stream()
                 .map(menuToUpdate -> {
                     Menu menuParam = idMenuParamMap.get(menuToUpdate.getId());

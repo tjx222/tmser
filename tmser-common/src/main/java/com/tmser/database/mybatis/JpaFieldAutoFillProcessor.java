@@ -26,7 +26,8 @@ public class JpaFieldAutoFillProcessor implements AutoFillProcessor {
     private static final ConcurrentHashMap<String, Method> PRE_UPDATE_METHOD_CACHE = new ConcurrentHashMap<>(16);
     private static final ConcurrentHashMap<String, Method> PRE_PERSIST_METHOD_CACHE = new ConcurrentHashMap<>(16);
 
-    private static final Method MAGIC_METHOD = MethodUtils.getMatchingMethod(JpaFieldAutoFillProcessor.class, "processFiled");
+    private static final Method MAGIC_METHOD = MethodUtils.getMatchingMethod(JpaFieldAutoFillProcessor.class,
+            "processFiled",String.class,Object.class,SqlCommandType.class);
 
     /**
      * 处理要填充的字段
@@ -36,16 +37,18 @@ public class JpaFieldAutoFillProcessor implements AutoFillProcessor {
      * @param commandType 执行类型，只有插入和更新
      */
     public void processFiled(String id, Object param, SqlCommandType commandType) {
+        Object et = param;
         if(param instanceof Map){
             Map<String, Object> map = (Map) param;
-            Object et = map.getOrDefault(Constants.ENTITY, null);
-            if (et != null) {
-                switch (commandType){
-                    case UPDATE: fillUpdateField(et); break;
-                    case INSERT: fillInsertField(et); break;
-                    case SELECT: fillSelectFiled(et); break;
-                    default: break;
-                }
+            et = map.getOrDefault(Constants.ENTITY, null);
+        }
+
+        if (et != null) {
+            switch (commandType){
+                case UPDATE: fillUpdateField(et); break;
+                case INSERT: fillInsertField(et); break;
+                case SELECT: fillSelectFiled(et); break;
+                default: break;
             }
         }
     }
@@ -58,7 +61,7 @@ public class JpaFieldAutoFillProcessor implements AutoFillProcessor {
         try {
             Method processMethod = PRE_PERSIST_METHOD_CACHE.get(et.getClass().getName());
             if (Objects.isNull(processMethod)) {
-                final List<Method> processMethods = MethodUtils.getMethodsListWithAnnotation(et.getClass(), PrePersist.class);
+                final List<Method> processMethods = MethodUtils.getMethodsListWithAnnotation(et.getClass(), PrePersist.class,true,true);
                 if (CollectionUtils.isEmpty(processMethods)) {
                     addCache(false, et.getClass().getName(), MAGIC_METHOD);
                     return;
@@ -68,7 +71,8 @@ public class JpaFieldAutoFillProcessor implements AutoFillProcessor {
             }
 
             // 旧的 version 值
-            if (MAGIC_METHOD.equals(processMethod)) {
+            if (!MAGIC_METHOD.equals(processMethod)) {
+                processMethod.setAccessible(true);
                 processMethod.invoke(et, null);
             }
 
@@ -87,7 +91,6 @@ public class JpaFieldAutoFillProcessor implements AutoFillProcessor {
         String value = discriminatorValue.value();
         String fieldName = discriminatorColumn.name();
         DiscriminatorType fieldType = discriminatorColumn.discriminatorType();
-        Field field = FieldUtils.getField(et.getClass(), fieldName);
         Object actValue = null;
         switch (fieldType){
             case STRING: actValue = value; break;
@@ -102,7 +105,7 @@ public class JpaFieldAutoFillProcessor implements AutoFillProcessor {
         try {
             Method processMethod = PRE_UPDATE_METHOD_CACHE.get(et.getClass().getName());
             if (Objects.isNull(processMethod)) {
-                final List<Method> processMethods = MethodUtils.getMethodsListWithAnnotation(et.getClass(), PreUpdate.class);
+                final List<Method> processMethods = MethodUtils.getMethodsListWithAnnotation(et.getClass(), PreUpdate.class,true,true);
                 if (CollectionUtils.isEmpty(processMethods)) {
                     addCache(true, et.getClass().getName(), MAGIC_METHOD);
                     return;
@@ -111,7 +114,8 @@ public class JpaFieldAutoFillProcessor implements AutoFillProcessor {
                 addCache(true, et.getClass().getName(), processMethod);
             }
             // 旧的 version 值
-            if (MAGIC_METHOD.equals(processMethod)) {
+            if (!MAGIC_METHOD.equals(processMethod)) {
+                processMethod.setAccessible(true);
                 processMethod.invoke(et, null);
             }
         } catch (InvocationTargetException | IllegalAccessException e) {
