@@ -26,9 +26,10 @@ public class ListTest {
 
     @Test
     public void testDate() {
-        Date localDateTime = DateUtils.parseDate("2020-04-20 13:56");
+/*        Date localDateTime = DateUtils.parseDate("2020-04-20 13:56");
         System.out.println(localDateTime.getTime() / 1000);
         String s = " ";
-        System.out.println(Bytes.asList(s.getBytes(StandardCharsets.UTF_8)));
+        System.out.println(Bytes.asList(s.getBytes(StandardCharsets.UTF_8)));*/
+        System.out.println((458753 & (1<<16)));
     }
 }

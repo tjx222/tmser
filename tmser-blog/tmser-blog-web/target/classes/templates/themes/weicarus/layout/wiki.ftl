@@ -12,7 +12,7 @@
 				<p><span class="has-text-grey">编辑小子&nbsp;&nbsp;|&nbsp;&nbsp;${user.nickname!"博主"}</span></p>
 				<p><span class="has-text-grey">留言数量&nbsp;&nbsp;|&nbsp;&nbsp;${post.commentCount}次</span></p>	
               	<p><span class="has-text-grey">浏览数量&nbsp;&nbsp;|&nbsp;&nbsp;${post.visits!}次</span></p>
-              	<p><time class="has-text-grey" datetime="${post.createTime!}">编辑时间&nbsp;&nbsp;|&nbsp;&nbsp;${post.createTime?string('yyyy-MM-dd
+              	<p><time class="has-text-grey" datetime="${post.createTime?string('yyyy-MM-dd')}">编辑时间&nbsp;&nbsp;|&nbsp;&nbsp;${post.createTime?string('yyyy-MM-dd
 				HH:mm:ss')}</time></p>
 			</div>
 		</div>

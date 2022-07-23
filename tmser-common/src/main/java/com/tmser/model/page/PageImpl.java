@@ -113,6 +113,9 @@ public class PageImpl<T> implements Page<T>, Serializable {
         return this.total;
     }
 
+    public int getTotalPages() {
+        return getSize() == 0 ? 1 : (int) Math.ceil((double) total / (double) getSize());
+    }
 
     public PageImpl<T> setTotal(long total) {
         this.total = total;
@@ -156,6 +159,18 @@ public class PageImpl<T> implements Page<T>, Serializable {
      */
     public Long maxLimit() {
         return this.maxLimit;
+    }
+
+    public int getNumber() {
+        return (int) current;
+    }
+
+    public boolean isLast() {
+        return !hasNext();
+    }
+
+    public long getTotalElements() {
+        return total;
     }
 
     /**

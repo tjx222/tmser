@@ -65,7 +65,7 @@
 					<#-- 文章的详情页面信息 -->
 					<div class="level level-left article-meta is-size-7 is-uppercase is-overflow-x-auto">
 						<span class="has-text-grey"><i class="fas fa-user mr-2"></i>&nbsp;&nbsp;${user.nickname!"博主"}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-						<time class="has-text-grey" datetime="${post.createTime!}"><i class="fas fa-calendar mr-2"></i>&nbsp;&nbsp;${post.createTime?string('yyyy-MM-dd HH:mm:ss')}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</time>
+						<time class="has-text-grey" datetime="${post.createTime?string('yyyy-MM-dd')}"><i class="fas fa-calendar mr-2"></i>&nbsp;&nbsp;${post.createTime?string('yyyy-MM-dd HH:mm:ss')}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</time>
 						<span class="has-text-grey"><i class="fas fa-eye mr-2"></i>&nbsp;&nbsp;${post.visits!}次浏览&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
 						<span class="has-text-grey"><i class="fas fa-comments mr-2"></i>&nbsp;&nbsp;${post.commentCount}次留言</span>
 					</div>
@@ -98,7 +98,8 @@
 				<#if index && post.summary?? && post.summary!=''>
 					<div class="level level-left article-meta is-size-7 is-uppercase is-overflow-x-auto">
 						<span class="has-text-grey"><i class="fas fa-user mr-2"></i>&nbsp;&nbsp;${user.nickname!"博主"}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-						<time class="has-text-grey" datetime="${post.createTime!}"><i class="fas fa-calendar mr-2"></i>&nbsp;&nbsp;${post.createTime?string('yyyy-MM-dd
+						<time class="has-text-grey" datetime="${post.createTime?string('yyyy-MM-dd
+							HH:mm')}"><i class="fas fa-calendar mr-2"></i>&nbsp;&nbsp;${post.createTime?string('yyyy-MM-dd
 							HH:mm')}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</time>
 						<span class="has-text-grey"><i class="fas fa-eye mr-2"></i>&nbsp;&nbsp;${post.visits!}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
 						<span class="has-text-grey"><i class="fas fa-comments mr-2"></i>&nbsp;&nbsp;${post.commentCount}</span>
