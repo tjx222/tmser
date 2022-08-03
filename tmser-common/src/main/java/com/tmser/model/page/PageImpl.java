@@ -173,35 +173,6 @@ public class PageImpl<T> implements Page<T>, Serializable {
         return total;
     }
 
-    /**
-     * 查找 order 中正序排序的字段数组
-     *
-     * @param filter 过滤器
-     * @return 返回正序排列的字段数组
-     */
-    private String[] mapOrderToArray(Predicate<Sort.Order> filter) {
-        List<String> columns = sort.stream()
-                .filter(i -> (filter.test(i)))
-                .map(Sort.Order::getProperty).collect(Collectors.toList());
-
-        return columns.toArray(new String[0]);
-    }
-
-    /**
-     * 移除符合条件的条件
-     *
-     * @param filter 条件判断
-     */
-    private void removeOrder(Predicate<Sort.Order> filter) {
-        Iterator<Sort.Order> iterator = sort.stream().iterator();
-        while (iterator.hasNext()) {
-            Sort.Order next = iterator.next();
-            if (filter.test(next)) {
-                iterator.remove();
-            }
-        }
-    }
-
 
     public PageImpl<T> setSearchCount(boolean searchCount) {
         this.searchCount = searchCount;

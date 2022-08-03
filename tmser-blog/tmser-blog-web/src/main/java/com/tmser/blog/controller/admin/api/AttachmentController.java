@@ -1,6 +1,7 @@
 package com.tmser.blog.controller.admin.api;
 
 import com.tmser.blog.model.dto.AttachmentDTO;
+import com.tmser.blog.model.dto.post.BasePostMinimalDTO;
 import com.tmser.blog.model.entity.Attachment;
 import com.tmser.blog.model.enums.AttachmentType;
 import com.tmser.blog.model.params.AttachmentParam;
@@ -8,6 +9,7 @@ import com.tmser.blog.model.params.AttachmentQuery;
 import com.tmser.blog.service.AttachmentService;
 import com.tmser.model.page.Page;
 import com.tmser.model.page.PageImpl;
+import com.tmser.model.sort.Sort;
 import com.tmser.spring.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +35,16 @@ public class AttachmentController {
         this.attachmentService = attachmentService;
     }
 
+
+    @GetMapping("latest")
+    public List<AttachmentDTO> pageLatest(
+            @RequestParam(name = "top", defaultValue = "10") int top) {
+        Page<AttachmentDTO> pageData = attachmentService.pageDtosBy(
+                PageImpl.of(1, top, Sort.by(Sort.Direction.DESC, "create_time")),
+                new AttachmentQuery());
+        return pageData.getContent();
+    }
+
     @GetMapping
     public Page<AttachmentDTO> pageBy(
             @PageableDefault(sort = "create_time,DESC") PageImpl pageable,
@@ -41,7 +53,6 @@ public class AttachmentController {
     }
 
     @GetMapping("{id:\\d+}")
-
     public AttachmentDTO getBy(@PathVariable("id") Integer id) {
         Attachment attachment = attachmentService.getById(id);
         return attachmentService.convertToDto(attachment);

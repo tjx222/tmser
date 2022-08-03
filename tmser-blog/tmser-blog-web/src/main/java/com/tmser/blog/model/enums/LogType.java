@@ -75,7 +75,18 @@ public enum LogType implements ValueEnum<Integer> {
     /**
      * Logged pre check
      */
-    LOGGED_PRE_CHECK(70);
+    LOGGED_PRE_CHECK(70),
+
+    /**
+     * ShareInfo published
+     */
+    SHARE_CREATED(80),
+
+    /**
+     * ShareInfo published
+     */
+    SHARE_UPDATE(85),
+    SHARE_DELETE(86);
 
     private final Integer value;
 
