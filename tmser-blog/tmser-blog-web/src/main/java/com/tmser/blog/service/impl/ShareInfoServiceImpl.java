@@ -25,6 +25,7 @@ import org.springframework.util.Assert;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -102,5 +103,19 @@ public class ShareInfoServiceImpl extends AbstractCrudService<ShareInfo, Integer
         return resultPage.setContent(shareInfoPage.getContent()
                 .stream()
                 .map(shareInfo -> new ShareInfoDTO().<ShareInfoDTO> convertFrom(shareInfo)).collect(Collectors.toList()));
+    }
+
+    @Override
+    public ShareInfoDTO getShareBySign(String sign) {
+        ShareInfo shareInfo = shareInfoRepository.selectBySign(sign);
+        if(Objects.isNull(shareInfo)){
+            return null;
+        }
+       return new ShareInfoDTO().<ShareInfoDTO>convertFrom(shareInfo);
+    }
+
+    @Override
+    public void updateVisitCount(Integer id) {
+        shareInfoRepository.updateVisitCount(id);
     }
 }

@@ -55,4 +55,17 @@ public interface ShareInfoService extends CrudService<ShareInfo, Integer> {
      * @return
      */
     Page<ShareInfoDTO> pageDtosBy(Pageable pageable, ShareInfoParam shareInfoParam);
+
+    /**
+     *
+     * @param sign
+     * @return
+     */
+    ShareInfoDTO getShareBySign(String sign);
+
+    /**
+     * 更新访问总次数
+     * @param id 分享id
+     */
+    void updateVisitCount(Integer id);
 }

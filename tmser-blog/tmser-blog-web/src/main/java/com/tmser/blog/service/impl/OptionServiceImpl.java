@@ -78,8 +78,8 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer>
             Option oldOption = optionKeyMap.get(key);
             if (oldOption == null || !StringUtils.equals(oldOption.getOptionValue(), value.toString())) {
                 OptionParam optionParam = new OptionParam();
-                optionParam.setKey(key);
-                optionParam.setValue(value.toString());
+                optionParam.setOptionKey(key);
+                optionParam.setOptionValue(value.toString());
                 ValidationUtils.validate(optionParam);
 
                 if (oldOption == null) {
@@ -114,7 +114,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer>
         }
 
         Map<String, Object> optionMap =
-                ServiceUtils.convertToMap(optionParams, OptionParam::getKey, OptionParam::getValue);
+                ServiceUtils.convertToMap(optionParams, OptionParam::getOptionKey, OptionParam::getOptionValue);
         save(optionMap);
     }
 

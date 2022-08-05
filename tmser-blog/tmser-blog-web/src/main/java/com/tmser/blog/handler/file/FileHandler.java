@@ -5,6 +5,7 @@ import static com.tmser.blog.model.support.HaloConst.FILE_SEPARATOR;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 import java.util.function.Supplier;
 import javax.imageio.ImageReader;
 import org.apache.commons.lang3.StringUtils;
@@ -116,5 +117,12 @@ public interface FileHandler {
      * @return attachment type
      */
     AttachmentType getAttachmentType();
+
+    /**
+     *
+     */
+    default String generateUrl(@NonNull String key, Map<String,String> params){
+        return "";
+    }
 
 }

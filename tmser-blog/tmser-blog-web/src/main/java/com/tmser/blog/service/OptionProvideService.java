@@ -69,7 +69,7 @@ public interface OptionProvideService {
     default List<OptionDTO> listDtos() {
         List<OptionDTO> result = new LinkedList<>();
 
-        listOptions().forEach((key, value) -> result.add(new OptionDTO(key, value)));
+        listOptions().forEach((key, value) -> result.add(new OptionDTO(key, String.valueOf(value))));
 
         return result;
     }

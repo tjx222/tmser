@@ -32,4 +32,14 @@ public class VisitLogParam implements InputConverter<VisitLog> {
     private String contentName;
 
     private String ipAddress;
+
+    public VisitLogParam(Integer shareId,
+                         Integer contentId,
+                         String shareName,
+                         String contentName) {
+        this.shareId = shareId;
+        this.contentId = contentId;
+        this.shareName = shareName;
+        this.contentName = contentName;
+    }
 }

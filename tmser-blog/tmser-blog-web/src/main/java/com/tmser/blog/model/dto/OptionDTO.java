@@ -12,13 +12,34 @@ import com.tmser.blog.model.entity.Option;
  * @author johnniang
  * @date 3/20/19
  */
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class OptionDTO implements OutputConverter<OptionDTO, Option> {
+    private String optionKey;
 
-    private String key;
+    private String optionValue;
 
-    private Object value;
+    public String getKey() {
+        return optionKey;
+    }
 
+    public String getValue() {
+        return optionValue;
+    }
+
+    public String getOptionKey() {
+        return optionKey;
+    }
+
+    public void setOptionKey(String optionKey) {
+        this.optionKey = optionKey;
+    }
+
+    public String getOptionValue() {
+        return optionValue;
+    }
+
+    public void setOptionValue(String optionValue) {
+        this.optionValue = optionValue;
+    }
 }
