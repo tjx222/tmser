@@ -48,8 +48,8 @@ public class CosTest {
 
     private COSClient generateClient() {
         String region ="ap-beijing";
-        String secretId ="AKIDjHaeT3OUM1RbWCdptgEWZNxINDoAOWP3";
-        String secretKey ="SfeOt9AwTlocBVbS4RZS6VfbIkxve8NM";
+        String secretId ="AKIDjHaeT3OUM1RNxINDoAOWP3";
+        String secretKey ="SfeOt9AwTIkxve8NM";
         COSCredentials cred = new BasicCOSCredentials(secretId, secretKey);
         Region regionConfig = new Region(region);
         ClientConfig clientConfig = new ClientConfig(regionConfig);
