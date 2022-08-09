@@ -15,7 +15,6 @@
         <druid.version>1.2.5</druid.version>
         <guava.version>31.0.1-jre</guava.version>
         <commons-io.version>2.11.0</commons-io.version>
-        <swagger.version>3.0.0</swagger.version>
         <commonsFileUpload.version>1.4</commonsFileUpload.version>
         <jgit.version>5.9.0.202009080501-r</jgit.version>
         <flexmark.version>0.62.2</flexmark.version>
@@ -86,46 +85,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.aliyun.oss</groupId>
-            <artifactId>aliyun-sdk-oss</artifactId>
-            <version>${aliyunSdk.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.qiniu</groupId>
-            <artifactId>qiniu-java-sdk</artifactId>
-            <version>${qiniuSdk.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.upyun</groupId>
-            <artifactId>java-sdk</artifactId>
-            <version>${upyunSdk.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.baidubce</groupId>
-            <artifactId>bce-java-sdk</artifactId>
-            <version>${baiduSdk.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>com.qcloud</groupId>
             <artifactId>cos_api</artifactId>
             <version>${qcloudSdk.version}</version>
-        </dependency>
-
-
-        <dependency>
-            <groupId>com.huaweicloud</groupId>
-            <artifactId>esdk-obs-java</artifactId>
-            <version>${huaweiObs.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.minio</groupId>
-            <artifactId>minio</artifactId>
-            <version>${minioSdk.version}</version>
         </dependency>
 
         <dependency>
@@ -288,8 +250,17 @@
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>admin/**/*.*</exclude>
+                </excludes>
             </resource>
         </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
     </build>
     <profiles>
         <profile>
@@ -356,6 +327,13 @@
                 <resources>
                     <resource>
                         <directory>profiles/${env}</directory>
+                    </resource>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                        <excludes>
+                            <exclude>admin/**/*.*</exclude>
+                        </excludes>
+                        <filtering>false</filtering>
                     </resource>
                 </resources>
             </build>

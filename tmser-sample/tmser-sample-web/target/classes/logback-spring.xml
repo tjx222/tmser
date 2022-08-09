@@ -1,6 +1,6 @@
 <configuration>
-    <property name="APP_NAME" value="tmser-sample-web"/>
-    <property name="LOG_HOME" value="../data/www/logs" />
+    <property name="APP_NAME" value="material"/>
+    <property name="LOG_HOME" value="/data/www/logs" />
     <contextName>${APP_NAME}</contextName>
     <!-- 通用appender 配置 -->
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
@@ -33,16 +33,36 @@
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [ %thread ] [%X{traceId}] - [ %-5level ] [ %logger{50} : %line ] - %msg%n</pattern>
         </layout>
     </appender>
+    <appender name="yachAppender" class="com.izk.common.log.logback.SyncCallbackAppender"/>
     <root level="INFO">
         <appender-ref ref="stdout"/>
         <appender-ref ref="FILE"/>
+        <appender-ref ref="yachAppender"/>
     </root>
+
 
     <logger name="org.springframework" level="INFO" additivity="false">
         <appender-ref ref="stdout"/>
     </logger>
     <logger name="com.mysql.jdbc" level="INFO" additivity="false">
         <appender-ref ref="stdout"/>
+    </logger>
+    <logger name="org.redisson.command" level="INFO" additivity="false">
+        <appender-ref ref="stdout"/>
+    </logger>
+    <logger name="org.redisson.connection" level="INFO" additivity="false">
+        <appender-ref ref="stdout"/>
+    </logger>
+
+    <logger name="org.redisson.cluster" level="INFO" additivity="false">
+        <appender-ref ref="stdout"/>
+    </logger>
+    <logger name="org.apache.http" level="INFO" additivity="false">
+        <appender-ref ref="stdout"/>
+    </logger>
+    <logger name="com.izk.common" level="INFO" additivity="false">
+        <appender-ref ref="stdout"/>
+        <appender-ref ref="FILE"/>
     </logger>
 
     <!-- 配置异常日志 -->
@@ -59,7 +79,6 @@
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [ %thread ] - [ %-5level ] [ %logger{50} : %line ] - %msg%n</pattern>
         </layout>
     </appender>
-
     <logger name="exceptionLogger" level="ALL" additivity="false">
         <appender-ref ref="exceptionAppender"/>
         <appender-ref ref="stdout"/>

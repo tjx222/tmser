@@ -153,13 +153,6 @@ public class HaloMvcConfiguration implements WebMvcConfigurer {
         resolvers.add(pageableResolver);
     }
 
-    @Override
-    public void addViewControllers(ViewControllerRegistry registry) {
-        // for backward compatibility
-        registry.addViewController("/swagger-ui.html")
-                .setViewName("redirect:" + swaggerBaseUrl + "/swagger-ui/");
-    }
-
     /**
      * Configuring static resource path
      *
@@ -189,8 +182,6 @@ public class HaloMvcConfiguration implements WebMvcConfigurer {
                 .addResourceLocations("classpath:/admin/");
 
         // If doc is enable
-        registry.addResourceHandler("swagger-ui.html")
-                .addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("/webjars/**")
                 .addResourceLocations("classpath:/META-INF/resources/webjars/");
     }

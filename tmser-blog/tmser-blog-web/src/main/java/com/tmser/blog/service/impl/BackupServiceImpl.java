@@ -25,6 +25,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipOutputStream;
+
+import com.tmser.blog.model.entity.*;
+import com.tmser.blog.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
@@ -44,53 +47,10 @@ import com.tmser.blog.exception.ServiceException;
 import com.tmser.blog.handler.file.FileHandler;
 import com.tmser.blog.model.dto.BackupDTO;
 import com.tmser.blog.model.dto.post.BasePostDetailDTO;
-import com.tmser.blog.model.entity.Attachment;
-import com.tmser.blog.model.entity.Category;
-import com.tmser.blog.model.entity.CommentBlackList;
-import com.tmser.blog.model.entity.Journal;
-import com.tmser.blog.model.entity.JournalComment;
-import com.tmser.blog.model.entity.Link;
-import com.tmser.blog.model.entity.Log;
-import com.tmser.blog.model.entity.Menu;
-import com.tmser.blog.model.entity.Option;
-import com.tmser.blog.model.entity.Photo;
-import com.tmser.blog.model.entity.Post;
-import com.tmser.blog.model.entity.PostCategory;
-import com.tmser.blog.model.entity.PostComment;
-import com.tmser.blog.model.entity.PostMeta;
-import com.tmser.blog.model.entity.PostTag;
-import com.tmser.blog.model.entity.Sheet;
-import com.tmser.blog.model.entity.SheetComment;
-import com.tmser.blog.model.entity.SheetMeta;
-import com.tmser.blog.model.entity.Tag;
-import com.tmser.blog.model.entity.ThemeSetting;
-import com.tmser.blog.model.entity.User;
 import com.tmser.blog.model.params.PostMarkdownParam;
 import com.tmser.blog.model.support.HaloConst;
 import com.tmser.blog.model.vo.PostMarkdownVO;
 import com.tmser.blog.security.service.OneTimeTokenService;
-import com.tmser.blog.service.AttachmentService;
-import com.tmser.blog.service.BackupService;
-import com.tmser.blog.service.CategoryService;
-import com.tmser.blog.service.CommentBlackListService;
-import com.tmser.blog.service.JournalCommentService;
-import com.tmser.blog.service.JournalService;
-import com.tmser.blog.service.LinkService;
-import com.tmser.blog.service.LogService;
-import com.tmser.blog.service.MenuService;
-import com.tmser.blog.service.OptionService;
-import com.tmser.blog.service.PhotoService;
-import com.tmser.blog.service.PostCategoryService;
-import com.tmser.blog.service.PostCommentService;
-import com.tmser.blog.service.PostMetaService;
-import com.tmser.blog.service.PostService;
-import com.tmser.blog.service.PostTagService;
-import com.tmser.blog.service.SheetCommentService;
-import com.tmser.blog.service.SheetMetaService;
-import com.tmser.blog.service.SheetService;
-import com.tmser.blog.service.TagService;
-import com.tmser.blog.service.ThemeSettingService;
-import com.tmser.blog.service.UserService;
 import com.tmser.blog.utils.DateTimeUtils;
 import com.tmser.blog.utils.DateUtils;
 import com.tmser.blog.utils.FileUtils;
@@ -119,45 +79,15 @@ public class BackupServiceImpl implements BackupService {
 
     private static final String UPLOAD_SUB_DIR = "upload/";
 
+    private final VisitLogService visitLogService;
+
+    private final ShareInfoService shareInfoService;
+
     private final AttachmentService attachmentService;
-
-    private final CategoryService categoryService;
-
-    private final CommentBlackListService commentBlackListService;
-
-    private final JournalService journalService;
-
-    private final JournalCommentService journalCommentService;
-
-    private final LinkService linkService;
 
     private final LogService logService;
 
-    private final MenuService menuService;
-
     private final OptionService optionService;
-
-    private final PhotoService photoService;
-
-    private final PostService postService;
-
-    private final PostCategoryService postCategoryService;
-
-    private final PostCommentService postCommentService;
-
-    private final PostMetaService postMetaService;
-
-    private final PostTagService postTagService;
-
-    private final SheetService sheetService;
-
-    private final SheetCommentService sheetCommentService;
-
-    private final SheetMetaService sheetMetaService;
-
-    private final TagService tagService;
-
-    private final ThemeSettingService themeSettingService;
 
     private final UserService userService;
 
@@ -167,37 +97,16 @@ public class BackupServiceImpl implements BackupService {
 
     private final ApplicationEventPublisher eventPublisher;
 
-    public BackupServiceImpl(AttachmentService attachmentService, CategoryService categoryService,
-        CommentBlackListService commentBlackListService, JournalService journalService,
-        JournalCommentService journalCommentService, LinkService linkService, LogService logService,
-        MenuService menuService, OptionService optionService, PhotoService photoService,
-        PostService postService, PostCategoryService postCategoryService,
-        PostCommentService postCommentService, PostMetaService postMetaService,
-        PostTagService postTagService, SheetService sheetService,
-        SheetCommentService sheetCommentService, SheetMetaService sheetMetaService,
-        TagService tagService, ThemeSettingService themeSettingService, UserService userService,
+    public BackupServiceImpl(AttachmentService attachmentService, VisitLogService visitLogService,
+                             ShareInfoService shareInfoService, LogService logService,
+         OptionService optionService, UserService userService,
         OneTimeTokenService oneTimeTokenService, HaloProperties haloProperties,
         ApplicationEventPublisher eventPublisher) {
         this.attachmentService = attachmentService;
-        this.categoryService = categoryService;
-        this.commentBlackListService = commentBlackListService;
-        this.journalService = journalService;
-        this.journalCommentService = journalCommentService;
-        this.linkService = linkService;
+        this.shareInfoService = shareInfoService;
+        this.visitLogService = visitLogService;
         this.logService = logService;
-        this.menuService = menuService;
         this.optionService = optionService;
-        this.photoService = photoService;
-        this.postService = postService;
-        this.postCategoryService = postCategoryService;
-        this.postCommentService = postCommentService;
-        this.postMetaService = postMetaService;
-        this.postTagService = postTagService;
-        this.sheetService = sheetService;
-        this.sheetCommentService = sheetCommentService;
-        this.sheetMetaService = sheetMetaService;
-        this.tagService = tagService;
-        this.themeSettingService = themeSettingService;
         this.userService = userService;
         this.oneTimeTokenService = oneTimeTokenService;
         this.haloProperties = haloProperties;
@@ -211,7 +120,7 @@ public class BackupServiceImpl implements BackupService {
         String markdown = FileUtils.readString(file.getInputStream());
 
         // TODO sheet import
-        return postService.importMarkdown(markdown, file.getOriginalFilename());
+        return null;
     }
 
     @Override
@@ -348,25 +257,27 @@ public class BackupServiceImpl implements BackupService {
         data.put("version", HaloConst.HALO_VERSION);
         data.put("export_date", DateUtils.now());
         data.put("attachments", attachmentService.listAll());
-        data.put("categories", categoryService.listAll(true));
-        data.put("comment_black_list", commentBlackListService.listAll());
-        data.put("journals", journalService.listAll());
-        data.put("journal_comments", journalCommentService.listAll());
-        data.put("links", linkService.listAll());
+//        data.put("categories", categoryService.listAll(true));
+//        data.put("comment_black_list", commentBlackListService.listAll());
+//        data.put("journals", journalService.listAll());
+//        data.put("journal_comments", journalCommentService.listAll());
+//        data.put("links", linkService.listAll());
         data.put("logs", logService.listAll());
-        data.put("menus", menuService.listAll());
+        data.put("visitLogs", visitLogService.listAll());
+        data.put("shareInfos", shareInfoService.listAll());
+ //       data.put("menus", menuService.listAll());
         data.put("options", optionService.listAll());
-        data.put("photos", photoService.listAll());
-        data.put("posts", postService.listAll());
-        data.put("post_categories", postCategoryService.listAll());
-        data.put("post_comments", postCommentService.listAll());
-        data.put("post_metas", postMetaService.listAll());
-        data.put("post_tags", postTagService.listAll());
-        data.put("sheets", sheetService.listAll());
-        data.put("sheet_comments", sheetCommentService.listAll());
-        data.put("sheet_metas", sheetMetaService.listAll());
-        data.put("tags", tagService.listAll());
-        data.put("theme_settings", themeSettingService.listAll());
+//        data.put("photos", photoService.listAll());
+//        data.put("posts", postService.listAll());
+//        data.put("post_categories", postCategoryService.listAll());
+//        data.put("post_comments", postCommentService.listAll());
+//        data.put("post_metas", postMetaService.listAll());
+//        data.put("post_tags", postTagService.listAll());
+//        data.put("sheets", sheetService.listAll());
+//        data.put("sheet_comments", sheetCommentService.listAll());
+//        data.put("sheet_metas", sheetMetaService.listAll());
+//        data.put("tags", tagService.listAll());
+       // data.put("theme_settings", themeSettingService.listAll());
         data.put("user", userService.listAll());
 
         try {
@@ -442,88 +353,23 @@ public class BackupServiceImpl implements BackupService {
             .readValue(mapper.writeValueAsString(data.get("attachments")), Attachment[].class));
         attachmentService.createInBatch(attachments);
 
-        List<Category> categories = Arrays.asList(
-            mapper.readValue(mapper.writeValueAsString(data.get("categories")), Category[].class));
-        categoryService.createInBatch(categories);
+        List<ShareInfo> shareInfos = Arrays.asList(mapper
+                .readValue(mapper.writeValueAsString(data.get("shareInfos")), ShareInfo[].class));
+        shareInfoService.createInBatch(shareInfos);
 
-        List<Tag> tags = Arrays
-            .asList(mapper.readValue(mapper.writeValueAsString(data.get("tags")), Tag[].class));
-        tagService.createInBatch(tags);
-
-        List<CommentBlackList> commentBlackList = Arrays.asList(mapper
-            .readValue(mapper.writeValueAsString(data.get("comment_black_list")),
-                CommentBlackList[].class));
-        commentBlackListService.createInBatch(commentBlackList);
-
-        List<Journal> journals = Arrays.asList(
-            mapper.readValue(mapper.writeValueAsString(data.get("journals")), Journal[].class));
-        journalService.createInBatch(journals);
-
-        List<JournalComment> journalComments = Arrays.asList(mapper
-            .readValue(mapper.writeValueAsString(data.get("journal_comments")),
-                JournalComment[].class));
-        journalCommentService.createInBatch(journalComments);
-
-        List<Link> links = Arrays
-            .asList(mapper.readValue(mapper.writeValueAsString(data.get("links")), Link[].class));
-        linkService.createInBatch(links);
+        List<VisitLog> visitLogs = Arrays.asList(mapper
+                .readValue(mapper.writeValueAsString(data.get("visitLogs")), VisitLog[].class));
+        visitLogService.createInBatch(visitLogs);
 
         List<Log> logs = Arrays
             .asList(mapper.readValue(mapper.writeValueAsString(data.get("logs")), Log[].class));
         logService.createInBatch(logs);
-
-        List<Menu> menus = Arrays
-            .asList(mapper.readValue(mapper.writeValueAsString(data.get("menus")), Menu[].class));
-        menuService.createInBatch(menus);
 
         List<Option> options = Arrays.asList(
             mapper.readValue(mapper.writeValueAsString(data.get("options")), Option[].class));
         optionService.createInBatch(options);
 
         eventPublisher.publishEvent(new OptionUpdatedEvent(this));
-
-        List<Photo> photos = Arrays
-            .asList(mapper.readValue(mapper.writeValueAsString(data.get("photos")), Photo[].class));
-        photoService.createInBatch(photos);
-
-        List<Post> posts = Arrays
-            .asList(mapper.readValue(mapper.writeValueAsString(data.get("posts")), Post[].class));
-        postService.createInBatch(posts);
-
-        List<PostCategory> postCategories = Arrays.asList(mapper
-            .readValue(mapper.writeValueAsString(data.get("post_categories")),
-                PostCategory[].class));
-        postCategoryService.createInBatch(postCategories);
-
-        List<PostComment> postComments = Arrays.asList(mapper
-            .readValue(mapper.writeValueAsString(data.get("post_comments")), PostComment[].class));
-        postCommentService.createInBatch(postComments);
-
-        List<PostMeta> postMetas = Arrays.asList(
-            mapper.readValue(mapper.writeValueAsString(data.get("post_metas")), PostMeta[].class));
-        postMetaService.createInBatch(postMetas);
-
-        List<PostTag> postTags = Arrays.asList(
-            mapper.readValue(mapper.writeValueAsString(data.get("post_tags")), PostTag[].class));
-        postTagService.createInBatch(postTags);
-
-        List<Sheet> sheets = Arrays
-            .asList(mapper.readValue(mapper.writeValueAsString(data.get("sheets")), Sheet[].class));
-        sheetService.createInBatch(sheets);
-
-        List<SheetComment> sheetComments = Arrays.asList(mapper
-            .readValue(mapper.writeValueAsString(data.get("sheet_comments")),
-                SheetComment[].class));
-        sheetCommentService.createInBatch(sheetComments);
-
-        List<SheetMeta> sheetMetas = Arrays.asList(mapper
-            .readValue(mapper.writeValueAsString(data.get("sheet_metas")), SheetMeta[].class));
-        sheetMetaService.createInBatch(sheetMetas);
-
-        List<ThemeSetting> themeSettings = Arrays.asList(mapper
-            .readValue(mapper.writeValueAsString(data.get("theme_settings")),
-                ThemeSetting[].class));
-        themeSettingService.createInBatch(themeSettings);
 
         eventPublisher.publishEvent(new ThemeUpdatedEvent(this));
 
@@ -539,7 +385,7 @@ public class BackupServiceImpl implements BackupService {
     @Override
     public BackupDTO exportMarkdowns(PostMarkdownParam postMarkdownParam) throws IOException {
         // Query all Post data
-        List<PostMarkdownVO> postMarkdownList = postService.listPostMarkdowns();
+        List<PostMarkdownVO> postMarkdownList = Collections.emptyList();
         Assert.notEmpty(postMarkdownList, "当前无文章可以导出");
 
         // Write files to the temporary directory

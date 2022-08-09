@@ -1,7 +1,5 @@
 package com.tmser.blog.service;
 
-import com.qiniu.common.Zone;
-import com.qiniu.storage.Region;
 import com.tmser.blog.exception.MissingPropertyException;
 import com.tmser.blog.model.dto.OptionDTO;
 import com.tmser.blog.model.dto.OptionSimpleDTO;
@@ -324,49 +322,6 @@ public interface OptionProvideService {
      */
     int getRssPageSize();
 
-    /**
-     * Get qi niu yun zone.
-     *
-     * @return qiniu zone
-     */
-    @NonNull
-    @Deprecated
-    default Zone getQnYunZone() {
-        return getByProperty(QiniuOssProperties.OSS_ZONE).map(qiniuZone -> {
-
-            Zone zone;
-            switch (qiniuZone.toString()) {
-                case "z0":
-                    zone = Zone.zone0();
-                    break;
-                case "z1":
-                    zone = Zone.zone1();
-                    break;
-                case "z2":
-                    zone = Zone.zone2();
-                    break;
-                case "na0":
-                    zone = Zone.zoneNa0();
-                    break;
-                case "as0":
-                    zone = Zone.zoneAs0();
-                    break;
-                default:
-                    // Default is detecting zone automatically
-                    zone = Zone.autoZone();
-            }
-            return zone;
-
-        }).orElseGet(Zone::autoZone);
-    }
-
-    /**
-     * Get qiniu oss region.
-     *
-     * @return qiniu region
-     */
-    @NonNull
-    Region getQiniuRegion();
 
     /**
      * Gets locale.

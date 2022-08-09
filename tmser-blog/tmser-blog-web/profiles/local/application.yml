@@ -4,16 +4,6 @@ server:
   servlet:
     context-path: /
 
-nacos:
-  config:
-    enabled: true
-    serverAddr: localhost:8848
-    dataId: sample
-    type: yaml
-    autoRefresh: true
-    bootstrap:
-      logEnable: true
-
 management:
   endpoints:
     web:

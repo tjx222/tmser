@@ -53,9 +53,9 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
     @Override
     public void onApplicationEvent(ApplicationStartedEvent event) {
         this.initDirectory();
-        this.initThemes();
+        //this.initThemes();
         this.printStartInfo();
-        this.configGit();
+       // this.configGit();
     }
 
     private void configGit() {
@@ -69,11 +69,11 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
 
     private void printStartInfo() {
         String blogUrl = optionService.getBlogBaseUrl();
-        log.info(AnsiOutput.toString(AnsiColor.BRIGHT_BLUE, "Halo started at         ", blogUrl));
+        log.info(AnsiOutput.toString(AnsiColor.BRIGHT_BLUE, "Tmser started at         ", blogUrl));
         log.info(AnsiOutput
-                .toString(AnsiColor.BRIGHT_BLUE, "Halo admin started at   ", blogUrl, "/",
+                .toString(AnsiColor.BRIGHT_BLUE, "Tmser admin started at   ", blogUrl, "/",
                         haloProperties.getAdminPath()));
-        log.info(AnsiOutput.toString(AnsiColor.BRIGHT_YELLOW, "Halo has started successfully!"));
+        log.info(AnsiOutput.toString(AnsiColor.BRIGHT_YELLOW, "Tmser has started successfully!"));
     }
 
     /**

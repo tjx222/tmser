@@ -3,16 +3,14 @@ server:
   max-http-header-size: 184320
   servlet:
     context-path: /
-
-nacos:
-  config:
-    enabled: true
-    serverAddr: localhost:8848
-    dataId: sample
-    type: yaml
-    autoRefresh: true
-    bootstrap:
-      logEnable: true
+  tomcat:
+    accesslog:
+      enabled: true
+      directory: /home/work/data/logs/tmser
+      suffix: .log
+      pattern: traceId=[%{traceId}i],rpcId=[%{rpcId}i],remote_addr=[%a],http_x_forward=[%{X-Forwarded-For}i],time=[%{yyyy-MM-dd HH:mm:ss SSS}t],request=[%r],status=[%s],byte=[%b],elapsed=[%T],refer=[%{Referer}i],ua=[%{User-Agent}i],x=[%X]
+      prefix: tomcat-access_log
+      maxDays: 15
 
 management:
   endpoints:
@@ -36,7 +34,6 @@ management:
       enabled: false
     diskspace:
       path: /data
-
 spring:
   datasource:
     dynamic:
@@ -44,12 +41,12 @@ spring:
       strict: false #严格匹配数据源,默认false. true未匹配到指定数据源时抛异常,false使用默认数据源
       datasource:
         master:
-          url: jdbc:mysql://localhost:3306/halodb?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+          url: jdbc:mysql://localhost:3306/tmser?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
           username: root
-          password: 123456
+          password: YhsbjCfcys
 
 config.sensitive.aes_key: qwertyuioplkjhgf
 halo:
-  download-timeout: 5m
+  download-timeout: 10m
   cache: memory
-  workDir: E:\\third-git\\tmser\\tmser-blog\\tmser-blog-web\\target\\classes\\
+  workDir: /home/work/app/tmser/

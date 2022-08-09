@@ -1,6 +1,5 @@
 package com.tmser.blog.service.impl;
 
-import com.qiniu.storage.Region;
 import com.tmser.blog.model.dto.OptionSimpleDTO;
 import com.tmser.blog.model.params.OptionQuery;
 import com.tmser.blog.service.ClientOptionService;
@@ -64,11 +63,6 @@ public class ClientOptionServiceImpl implements ClientOptionService {
     @Override
     public int getRssPageSize() {
         return optionService.getRssPageSize();
-    }
-
-    @Override
-    public Region getQiniuRegion() {
-        return optionService.getQiniuRegion();
     }
 
     @Override

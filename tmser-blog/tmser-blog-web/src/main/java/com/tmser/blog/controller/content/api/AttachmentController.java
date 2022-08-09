@@ -57,6 +57,7 @@ public class AttachmentController {
 
         Assert.notNull(shareInfo,"签名不存在！");
         //
+        Assert.isTrue(shareInfo.getStartTime().before(new Date()),"分享还未生效");
         Assert.isTrue(shareInfo.getEndTime().after(new Date()),"分享已过期");
         Attachment attachment = attachmentService.getById(id);
         String previewUrl = fileHandlers.preview(attachment);

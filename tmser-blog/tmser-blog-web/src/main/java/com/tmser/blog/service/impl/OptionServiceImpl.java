@@ -1,7 +1,6 @@
 package com.tmser.blog.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.qiniu.storage.Region;
 import com.tmser.blog.cache.AbstractStringCacheStore;
 import com.tmser.blog.event.options.OptionUpdatedEvent;
 import com.tmser.blog.model.dto.OptionSimpleDTO;
@@ -270,36 +269,6 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer>
                     e);
             return DEFAULT_RSS_PAGE_SIZE;
         }
-    }
-
-    @Override
-    public Region getQiniuRegion() {
-        return getByProperty(QiniuOssProperties.OSS_ZONE).map(qiniuZone -> {
-
-            Region region;
-            switch (qiniuZone.toString()) {
-                case "z0":
-                    region = Region.region0();
-                    break;
-                case "z1":
-                    region = Region.region1();
-                    break;
-                case "z2":
-                    region = Region.region2();
-                    break;
-                case "na0":
-                    region = Region.regionNa0();
-                    break;
-                case "as0":
-                    region = Region.regionAs0();
-                    break;
-                default:
-                    // Default is detecting zone automatically
-                    region = Region.autoRegion();
-            }
-            return region;
-
-        }).orElseGet(Region::autoRegion);
     }
 
     @Override

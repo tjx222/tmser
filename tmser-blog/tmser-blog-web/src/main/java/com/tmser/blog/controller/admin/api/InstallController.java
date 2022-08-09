@@ -111,22 +111,22 @@ public class InstallController {
         User user = createUser(installParam);
 
         // Create default category
-        Category category = createDefaultCategoryIfAbsent();
+       // Category category = createDefaultCategoryIfAbsent();
 
         // Create default post
-        PostDetailVO post = createDefaultPostIfAbsent(category);
+      //  PostDetailVO post = createDefaultPostIfAbsent(category);
 
         // Create default sheet
-        createDefaultSheet();
+       // createDefaultSheet();
 
         // Create default postComment
-        createDefaultComment(post);
+        //createDefaultComment(post);
 
         // Create default menu
-        createDefaultMenu();
+       // createDefaultMenu();
 
         eventPublisher.publishEvent(
-            new LogEvent(this, user.getId().toString(), LogType.BLOG_INITIALIZED, "博客已成功初始化")
+            new LogEvent(this, user.getId().toString(), LogType.BLOG_INITIALIZED, "网站已成功初始化")
         );
 
         return BaseResponse.ok("安装完成！");
