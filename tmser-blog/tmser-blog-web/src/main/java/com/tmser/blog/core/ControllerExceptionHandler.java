@@ -120,6 +120,16 @@ public class ControllerExceptionHandler {
         return new ResponseEntity<>(baseResponse, e.getStatus());
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public BaseResponse<?> handleIllegalArgumentException(IllegalArgumentException e) {
+        BaseResponse<?> baseResponse = new BaseResponse<>();
+        baseResponse.setMessage(e.getMessage());
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        baseResponse.setStatus(status.value());
+        return baseResponse;
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public BaseResponse<?> handleGlobalException(Exception e) {

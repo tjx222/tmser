@@ -189,4 +189,11 @@ class SheetRepositoryTest {
         System.out.println(trie.search("tol"));
         System.out.println(trie.search("tool"));
     }
+
+    @Test
+    public void testList(){
+        List<Integer> list= new ArrayList<>();
+        list.add(1);
+        list.subList(0,1);
+    }
 }
