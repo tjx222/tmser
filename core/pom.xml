@@ -14,7 +14,7 @@
 <url>http://www.tmser.com</url>
 
 <properties>
-		<spring.version>3.2.6.RELEASE</spring.version>
+		<spring.version>3.2.18.RELEASE</spring.version>
 		<druid.version>0.2.19</druid.version>
 		<shiro.version>1.2.2</shiro.version>
 		<sitemesh.version>2.4.2</sitemesh.version>
